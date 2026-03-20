@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - CineSphere</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ffd700;
+            --primary-glow: rgba(255, 215, 0, 0.4);
+            --bg-dark: #050505;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 215, 0, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        .ambient-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at 50% 0%, rgba(30, 20, 0, 0.8) 0%, var(--bg-dark) 60%);
+            z-index: -2;
+        }
+
+        #stars { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 0.6);
+            animation: twinkle var(--duration, 4s) ease-in-out infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(0.6) translateY(0); }
+            100% { opacity: 1; transform: scale(1.3) translateY(-5px); }
+        }
+
+        nav {
+            padding: 20px 50px; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100; background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border);
+        }
+        .logo { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; color: var(--text-main); text-decoration: none; }
+        .logo span { color: var(--primary); }
+        .nav-links a { color: var(--text-muted); text-decoration: none; margin-left: 20px; font-weight: 500; font-family: 'Outfit', sans-serif; transition: 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+
+        header { text-align: center; padding: 60px 20px 20px; position: relative; z-index: 10; transform: translateY(20px); opacity: 0; animation: fadeUp 1s forwards cubic-bezier(0.2, 0.8, 0.2, 1); }
+        header h1 {
+            font-family: 'Outfit', sans-serif; font-size: 4rem; font-weight: 800;
+            background: linear-gradient(to right, #fff, #ffe066);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 15px;
+        }
+        header p { color: var(--primary); font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px 80px; position: relative; z-index: 10; }
+
+        .about-card {
+            background: rgba(10, 10, 10, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s 0.3s forwards cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .about-card p {
+            font-size: 1.2rem; line-height: 1.8; color: var(--text-muted); margin-bottom: 30px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 50px;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            padding: 30px 20px;
+            border-radius: 16px;
+            transition: 0.4s;
+        }
+        .feature:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.05);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .feature-icon { font-size: 2.5rem; margin-bottom: 15px; display: block; }
+        .feature h3 { font-family: 'Outfit', sans-serif; font-size: 1.4rem; color: #fff; margin-bottom: 10px; }
+        .feature p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0; }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .features-grid { grid-template-columns: 1fr; }
+            header h1 { font-size: 3rem; }
+            .about-card { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-bg"></div>
+    <div id="stars"></div>
+
+    <nav>
+        <a href="about_us.html" class="logo">CINE<span>SPHERE</span></a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+        </div>
+    </nav>
+
+    <header>
+        <h1>ABOUT US</h1>
+        <p>Your Portal to the Cinematic Universe</p>
+    </header>
+
+    <div class="container">
+        <div class="about-card">
+            <p>Welcome to <strong>CineSphere</strong>, the ultimate destination for cinema lovers. We transcend the traditional movie-going experience by blending real-time film discovery, immersive ticket booking, and a galaxy of snacks into one premium, seamless interface.</p>
+            <p>Our mission is to bring the magic of the silver screen directly to your fingertips. Whether you are searching for the latest blockbuster, booking seats for date night, or reading critical acclaim, CineSphere is designed to make every step of your journey extraordinary.</p>
+            
+            <div class="features-grid">
+                <div class="feature">
+                    <span class="feature-icon">🌌</span>
+                    <h3>Discovery</h3>
+                    <p>Explore an endless universe of movies powered by real-time data from global cinema databases.</p>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">🎟️</span>
+                    <h3>Experience</h3>
+                    <p>Secure premium seating with our seamless, futuristic booking system and multiple payment options.</p>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">✨</span>
+                    <h3>Community</h3>
+                    <p>Join thousands of users in rating and reviewing the latest masterpieces of modern cinema.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const starContainer = document.getElementById("stars");
+        for (let i = 0; i < 200; i++) {
+            const star = document.createElement("div");
+            star.className = "star";
+            const size = Math.random() * 2 + 1;
+            star.style.width = size + "px"; star.style.height = size + "px";
+            star.style.left = Math.random() * 100 + "vw"; star.style.top = Math.random() * 100 + "vh";
+            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+            star.style.animationDelay = (Math.random() * 5) + 's';
+            starContainer.appendChild(star);
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks) {
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user) {
+                    navLinks.innerHTML = `
+                        <a href="index.html">Home</a>
+                        <a href="profile.html" style="color:var(--primary)">Hi, ${user.username}</a>
+                        <a href="#" onclick="logout()">Logout</a>
+                    `;
+                } else {
+                    navLinks.innerHTML = `
+                        <a href="index.html">Home</a>
+                        <a href="login.html">Login</a>
+                        <a href="register.html">Register</a>
+                    `;
+                }
+            }
+        });
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>

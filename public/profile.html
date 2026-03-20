@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - CineSphere</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ffd700;
+            --primary-glow: rgba(255, 215, 0, 0.4);
+            --bg-dark: #050505;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
+
+        .ambient-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at 50% 0%, rgba(30, 20, 0, 0.8) 0%, var(--bg-dark) 60%); z-index: -2; }
+        #stars { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+        .star { position: absolute; background: #fff; border-radius: 50%; box-shadow: 0 0 15px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 0.6); animation: twinkle var(--duration, 4s) ease-in-out infinite alternate; }
+        @keyframes twinkle { 0% { opacity: 0.2; transform: scale(0.6) translateY(0); } 100% { opacity: 1; transform: scale(1.3) translateY(-5px); } }
+
+        nav { padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--glass-border); background: rgba(5,5,5,0.8); backdrop-filter: blur(15px); }
+        .logo { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; color: var(--text-main); text-decoration: none; }
+        .logo span { color: var(--primary); }
+        .nav-links a { color: var(--text-muted); text-decoration: none; margin-left: 20px; font-weight: 500; font-family: 'Outfit', sans-serif; transition: 0.3s; }
+        .nav-links a.btn-register {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid var(--primary);
+        }
+        .nav-links a:hover { color: var(--primary); }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 50px 20px; flex: 1; position: relative; z-index: 10; width: 100%; }
+
+        header { text-align: center; margin-bottom: 50px; }
+        header h1 { font-family: 'Outfit', sans-serif; font-size: 3.5rem; color: #fff; margin-bottom: 10px; }
+        header p { color: var(--primary); font-size: 1.2rem; }
+
+        .history-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        
+        .history-card { background: rgba(10, 10, 10, 0.7); border: 1px solid var(--glass-border); border-radius: 16px; padding: 25px 30px; backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+        .history-card:hover { border-color: rgba(255, 215, 0, 0.3); transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
+        
+        .history-icon { font-size: 2.5rem; margin-right: 25px; }
+        
+        .history-details { flex: 1; }
+        .history-title { font-family: 'Outfit', sans-serif; font-size: 1.4rem; color: #fff; margin-bottom: 5px; text-transform: capitalize; }
+        .history-meta { color: var(--text-muted); font-size: 0.95rem; }
+        .history-meta span { color: var(--primary); font-weight: 600; margin-right: 15px; }
+        
+        .history-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+        .history-date { color: #888; font-size: 0.9rem; }
+        .view-btn { background: rgba(255, 215, 0, 0.1); color: var(--primary); border: 1px solid var(--primary); padding: 6px 16px; border-radius: 20px; font-family: 'Outfit', sans-serif; cursor: pointer; transition: 0.3s; font-size: 0.9rem; }
+        .view-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary-glow); }
+
+        .empty-state { text-align: center; color: var(--text-muted); padding: 50px; font-size: 1.2rem; background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px dashed var(--glass-border); }
+
+        /* Modal */
+        .modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(5px); }
+        .modal.show { opacity: 1; pointer-events: auto; }
+        .modal-box { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--glass-border); border-top: 3px solid var(--primary); padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; transform: translateY(20px); transition: 0.3s; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .modal.show .modal-box { transform: translateY(0); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .modal-title { font-family: 'Outfit', sans-serif; font-size: 1.8rem; color: #fff; }
+        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
+        .close-btn:hover { color: #ff4c4c; }
+        .modal-body { color: #ccc; line-height: 1.6; font-size: 1.05rem; }
+        .modal-body ul { list-style: none; padding-left: 0; margin-top: 15px; }
+        .modal-body li { padding: 10px 0; border-bottom: 1px dashed rgba(255,255,255,0.1); display: flex; justify-content: space-between; }
+        .modal-body li:last-child { border-bottom: none; }
+        .modal-total { font-size: 1.3rem; color: var(--primary); font-family: 'Outfit', sans-serif; font-weight: 700; margin-top: 20px; text-align: right; }
+
+    </style>
+</head>
+<body>
+
+    <div class="ambient-bg"></div>
+    <div id="stars"></div>
+
+    <nav>
+        <a href="about_us.html" class="logo">CINE<span>SPHERE</span></a>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+            <a href="#" onclick="logout()" class="btn-register">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1 id="userName">Your Profile</h1>
+            <p>Your Cinematic History</p>
+        </header>
+
+        <div class="history-grid" id="historyContainer">
+            <div class="empty-state">Loading your universe...</div>
+        </div>
+    </div>
+
+    <!-- DETAILS MODAL -->
+    <div class="modal" id="detailsModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Order Details</div>
+                <button class="close-btn" onclick="closeModal()">✖</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Details injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Stars
+        const starContainer = document.getElementById("stars");
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement("div");
+            star.className = "star";
+            const size = Math.random() * 2 + 1;
+            star.style.width = size + "px"; star.style.height = size + "px";
+            star.style.left = Math.random() * 100 + "vw"; star.style.top = Math.random() * 100 + "vh";
+            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+            star.style.animationDelay = (Math.random() * 5) + 's';
+            starContainer.appendChild(star);
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        let globalHistory = [];
+
+        async function loadHistory() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('userName').innerText = `Welcome, ${user.username}`;
+            const container = document.getElementById('historyContainer');
+
+            try {
+                const res = await fetch(`http://localhost:3000/api/history/${user.userId}`);
+                const data = await res.json();
+                
+                if (data.success && data.history.length > 0) {
+                    globalHistory = data.history;
+                    container.innerHTML = '';
+                    data.history.forEach((item, index) => {
+                        const date = new Date(item.created_at).toLocaleString();
+                        let icon = item.action_type === 'booking' ? '🎟️' : '🍿';
+                        let title = item.action_type === 'booking' ? 'Movie Ticket Booked' : 'Snacks Ordered';
+                        let detailsStr = '';
+
+                        if (item.action_type === 'booking') {
+                            detailsStr = `<span>Tickets: ${item.details.tickets}</span> Total: $${parseFloat(item.details.total).toFixed(2)}`;
+                        } else {
+                            const itemsList = item.details.items ? item.details.items.length + ' Items' : 'Various Items';
+                            detailsStr = `<span>${itemsList}</span> Total: $${parseFloat(item.details.total).toFixed(2)}`;
+                        }
+
+                        container.innerHTML += `
+                            <div class="history-card">
+                                <div style="display:flex; align-items:center;">
+                                    <div class="history-icon">${icon}</div>
+                                    <div class="history-details">
+                                        <div class="history-title">${title}</div>
+                                        <div class="history-meta">${detailsStr}</div>
+                                    </div>
+                                </div>
+                                <div class="history-right">
+                                    <div class="history-date">${date}</div>
+                                    <button class="view-btn" onclick="openModal(${index})">View Details</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    container.innerHTML = `<div class="empty-state">You haven't made any bookings or orders yet.</div>`;
+                }
+            } catch (e) {
+                container.innerHTML = `<div class="empty-state">Error connecting to the celestial servers...</div>`;
+            }
+        }
+
+        function openModal(index) {
+            const item = globalHistory[index];
+            const modalBody = document.getElementById('modalBody');
+            const modalTitle = document.getElementById('modalTitle');
+            const date = new Date(item.created_at).toLocaleString();
+
+            if (item.action_type === 'booking') {
+                modalTitle.innerText = "🎟️ Booking Details";
+                const theaterHtml = item.details.theater ? `<p><strong>Theater:</strong> ${item.details.theater}</p>` : '';
+                const timeHtml = item.details.showtime ? `<p><strong>Showtime:</strong> ${item.details.showtime}</p>` : '';
+                modalBody.innerHTML = `
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:15px;">Order placed on ${date}</p>
+                    ${theaterHtml}
+                    ${timeHtml}
+                    <p><strong>Tickets Booked:</strong> ${item.details.tickets}</p>
+                    <div class="modal-total" style="margin-top:10px;">Total Paid: $${parseFloat(item.details.total).toFixed(2)}</div>
+                `;
+            } else {
+                modalTitle.innerText = "🍿 Snack Order";
+                let listHtml = item.details.items ? item.details.items.map(i => `<li><span>${i}</span></li>`).join('') : '';
+                modalBody.innerHTML = `
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:15px;">Order placed on ${date}</p>
+                    <p><strong>Items Ordered:</strong></p>
+                    <ul>${listHtml}</ul>
+                    <div class="modal-total">Total Paid: $${parseFloat(item.details.total).toFixed(2)}</div>
+                `;
+            }
+
+            document.getElementById('detailsModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('detailsModal').classList.remove('show');
+        }
+
+        loadHistory();
+    </script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout - CineSphere</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ffd700;
+            --primary-glow: rgba(255, 215, 0, 0.4);
+            --bg-dark: #050505;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex; flex-direction: column; min-height: 100vh;
+        }
+
+        .ambient-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at 50% 0%, rgba(30, 20, 0, 0.8) 0%, var(--bg-dark) 60%); z-index: -2; }
+        #stars { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 0.6);
+            animation: twinkle var(--duration, 4s) ease-in-out infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(0.6) translateY(0); }
+            100% { opacity: 1; transform: scale(1.3) translateY(-5px); }
+        }
+
+        nav {
+            padding: 20px 50px; display: flex; justify-content: space-between; align-items: center;
+            background: transparent; border-bottom: 1px solid var(--glass-border); width: 100%; position: absolute; top:0; z-index: 100;
+        }
+        .logo { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; color: var(--text-main); text-decoration: none; }
+        .logo span { color: var(--primary); }
+        .nav-links a { color: var(--text-muted); text-decoration: none; margin-left: 20px; font-weight: 500; font-family: 'Outfit', sans-serif; transition: 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+
+        .checkout-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; padding: 100px 20px 40px; position: relative; z-index: 10; }
+
+        .checkout-container {
+            display: flex; width: 1000px; max-width: 100%; background: rgba(10, 10, 10, 0.8);
+            border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--glass-border); backdrop-filter: blur(20px);
+        }
+
+        /* LEFT: MOVIE INFO */
+        .movie-info {
+            width: 45%; padding: 50px 40px; background: rgba(0, 0, 0, 0.4);
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            border-right: 1px solid var(--glass-border); position: relative;
+        }
+        .movie-info-bg { position: absolute; inset:0; background-size: cover; background-position: center; opacity: 0.15; z-index: -1; filter: blur(5px); }
+
+        .poster { width: 100%; max-width: 250px; border-radius: 12px; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); }
+
+        h2 { color: #fff; margin-bottom: 10px; font-size: 2rem; font-family: 'Outfit', sans-serif; font-weight: 800; line-height: 1.2; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        p.meta { color: var(--primary); margin-bottom: 20px; font-size: 0.95rem; font-weight: 600; padding: 5px 15px; background: rgba(255,215,0,0.1); border-radius: 20px; }
+        p.plot { color: var(--text-muted); line-height: 1.6; font-size: 0.95rem; text-align: left; }
+
+        /* RIGHT: BOOKING FORM */
+        .booking-form { width: 55%; padding: 50px 40px; display: flex; flex-direction: column; justify-content: space-between; }
+        h1 { margin-top: 0; color: #fff; font-family: 'Outfit', sans-serif; font-size: 2rem; margin-bottom: 30px; letter-spacing: 1px; }
+
+        .section { margin-bottom: 35px; }
+        label { display: block; margin-bottom: 15px; color: #fff; font-weight: 600; font-family: 'Outfit', sans-serif; font-size: 1.1rem; }
+
+        .counter { display: inline-flex; align-items: center; gap: 20px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; border: 1px solid var(--glass-border); }
+        .btn-counter { background: rgba(255,255,255,0.1); color: #fff; border: none; width: 40px; height: 40px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.5rem; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
+        .btn-counter:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary-glow); }
+        #ticketCount { font-size: 1.5rem; font-weight: bold; width: 40px; text-align: center; font-family: 'Outfit', sans-serif; }
+
+        .payment-tabs { display: flex; gap: 15px; margin-bottom: 25px; }
+        .tab { flex: 1; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); color: var(--text-muted); cursor: pointer; text-align: center; border-radius: 8px; transition: 0.3s; font-family: 'Outfit', sans-serif; font-weight: 600; }
+        .tab.active { background: var(--primary); color: #000; border-color: var(--primary); box-shadow: 0 0 20px rgba(255,215,0,0.2); }
+
+        .payment-content { background: rgba(0,0,0,0.3); padding: 25px; border-radius: 12px; border: 1px solid var(--glass-border); min-height: 160px; display: flex; flex-direction: column; justify-content: center; }
+        .hide { display: none !important; }
+
+        input, select { width: 100%; padding: 15px 20px; margin-top: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 1rem; outline: none; transition: 0.3s; }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(255,215,0,0.1); background: rgba(255,255,255,0.1); }
+        select option { background: #111; color: #fff; }
+
+        .qr-box { text-align: center; padding: 15px; background: white; border-radius: 12px; width: 160px; height: 160px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+        .qr-box img { width: 100%; height: 100%; object-fit: contain; }
+
+        .total-area { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 30px; border-top: 1px solid var(--glass-border); margin-top: auto; }
+        .price-label { color: var(--text-muted); font-size: 1rem; margin-bottom: 5px; font-family: 'Inter', sans-serif; }
+        .price-tag { font-size: 2.5rem; color: var(--primary); font-weight: 800; font-family: 'Outfit', sans-serif; line-height: 1; }
+
+        .pay-btn { padding: 18px 50px; background: var(--primary); border: none; border-radius: 50px; color: #000; font-weight: 800; font-size: 1.2rem; font-family: 'Outfit', sans-serif; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+        .pay-btn:hover { box-shadow: 0 10px 30px rgba(255,215,0,0.4); transform: translateY(-3px); background: #fff; }
+
+        /* SUCCESS MODAL */
+        .modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: 0.4s; backdrop-filter: blur(10px); }
+        .modal.show { opacity: 1; pointer-events: auto; }
+        .modal-box { background: rgba(15,15,15,0.95); border: 1px solid var(--primary); padding: 50px; border-radius: 24px; text-align: center; box-shadow: 0 20px 60px rgba(255,215,0,0.15); transform: translateY(20px); transition: 0.4s; max-width: 450px; }
+        .modal.show .modal-box { transform: translateY(0); }
+        .tick { font-size: 5rem; margin-bottom: 20px; filter: drop-shadow(0 0 20px rgba(76, 175, 80, 0.5)); }
+
+        .form-select {
+            width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; border-radius: 8px; outline: none; font-family: 'Inter', sans-serif; transition: 0.3s;
+        }
+        .form-select:focus { border-color: var(--primary); }
+        .form-select option { background: #111; color: #fff; }
+
+        .time-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+        .time-pill { padding: 8px 16px; border: 1px solid var(--glass-border); border-radius: 20px; font-size: 0.9rem; cursor: pointer; transition: 0.3s; background: rgba(255,255,255,0.02); }
+        .time-pill.active { background: rgba(255, 215, 0, 0.15); border-color: var(--primary); color: var(--primary); font-weight: 600; }
+        .time-pill:hover:not(.active) { background: rgba(255,255,255,0.05); }
+
+        .screen-curve { width: 100%; height: 25px; border-top: 3px solid var(--primary); border-radius: 50% 50% 0 0; margin-bottom: 20px; text-align: center; color: var(--text-muted); font-size: 0.75rem; font-weight: bold; letter-spacing: 5px; opacity: 0.5; }
+        .seat-map { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; justify-content: center; margin-bottom: 20px; }
+        .seat { width: 100%; aspect-ratio: 1; background: rgba(255,255,255,0.1); border-radius: 6px 6px 2px 2px; cursor: pointer; transition: 0.2s; position: relative; }
+        .seat::after { content: ''; position: absolute; bottom: 0; left: 10%; width: 80%; height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; }
+        .seat:hover:not(.occupied) { transform: scale(1.1); background: rgba(255,255,255,0.3); }
+        .seat.selected { background: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+        .seat.selected::after { background: rgba(0,0,0,0.3); }
+        .seat.occupied { background: #333; cursor: not-allowed; opacity: 0.5; }
+        .seat.occupied::after { background: #222; }
+
+        .seat-legend { display: flex; justify-content: center; gap: 15px; font-size: 0.85rem; color: var(--text-muted); }
+        .seat-legend div { display: flex; align-items: center; gap: 5px; }
+        .seat-demo { width: 15px; height: 15px; border-radius: 3px; }
+        .seat-demo.available { background: rgba(255,255,255,0.1); }
+        .seat-demo.selected { background: var(--primary); }
+        .seat-demo.occupied { background: #333; }
+
+        @media (max-width: 900px) {
+            .checkout-container { flex-direction: column; width: 100%; max-width: 500px; }
+            .movie-info, .booking-form { width: 100%; border-right: none; }
+            .movie-info { border-bottom: 1px solid var(--glass-border); padding: 40px 20px; }
+            .booking-form { padding: 40px 20px; }
+            .total-area { flex-direction: column; align-items: stretch; gap: 20px; }
+            .pay-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-bg"></div>
+    <div id="stars"></div>
+
+    <nav>
+        <a href="about_us.html" class="logo">CINE<span>SPHERE</span></a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+        </div>
+    </nav>
+
+    <div class="checkout-wrapper">
+        <div class="checkout-container">
+            <div class="movie-info" id="movieInfo">
+                <div style="margin:auto; opacity:0.5; font-family:'Outfit';">Loading Movie Details...</div>
+            </div>
+
+            <div class="booking-form">
+                <div>
+                    <h1>COMPLETE BOOKING</h1>
+
+                    <div class="section">
+                        <label>Select Theater</label>
+                        <select id="theaterSelect" class="form-select">
+                            <option value="CineSphere IMAX Downtown">CineSphere IMAX Downtown</option>
+                            <option value="Galactic Multiplex 4K">Galactic Multiplex 4K</option>
+                            <option value="Starlight Drive-In">Starlight Drive-In</option>
+                        </select>
+                    </div>
+
+                    <div class="section">
+                        <label>Select Showtime</label>
+                        <div class="time-pills">
+                            <div class="time-pill active" onclick="selectTime(this, '10:30 AM')">10:30 AM</div>
+                            <div class="time-pill" onclick="selectTime(this, '1:15 PM')">1:15 PM</div>
+                            <div class="time-pill" onclick="selectTime(this, '4:45 PM')">4:45 PM</div>
+                            <div class="time-pill" onclick="selectTime(this, '8:00 PM')">8:00 PM</div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <label>Select Seats</label>
+                        <div class="screen-curve">SCREEN</div>
+                        <div class="seat-map" id="seatMap">
+                            <!-- Seats injected via JS -->
+                        </div>
+                        <div class="seat-legend">
+                            <div><div class="seat-demo available"></div> Available</div>
+                            <div><div class="seat-demo selected"></div> Selected</div>
+                            <div><div class="seat-demo occupied"></div> Occupied</div>
+                        </div>
+                        <div style="text-align:right; margin-top:10px; color:var(--text-muted); font-size:0.9rem;">
+                            Selected: <span id="seatCount" style="color:var(--primary); font-weight:bold;">0</span> / 10 Max
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <label>Payment Method</label>
+                        <div class="payment-tabs">
+                            <div class="tab active" onclick="switchTab('qr')">QR Code</div>
+                            <div class="tab" onclick="switchTab('upi')">UPI</div>
+                            <div class="tab" onclick="switchTab('net')">Net Banking</div>
+                        </div>
+
+                        <div id="qr" class="payment-content">
+                            <div class="qr-box">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=CineSpherePayment" alt="QR Code">
+                            </div>
+                            <p style="text-align:center; color:var(--text-muted); margin-top:15px; font-size: 0.9rem;">Scan with any payment app to pay</p>
+                        </div>
+
+                        <div id="upi" class="payment-content hide">
+                            <label style="font-size: 0.95rem; margin-bottom:5px;">Enter UPI ID (e.g. name@okhdfcbank)</label>
+                            <input type="text" placeholder="example@upi">
+                        </div>
+
+                        <div id="net" class="payment-content hide">
+                            <label style="font-size: 0.95rem; margin-bottom:5px;">Select Bank</label>
+                            <select>
+                                <option>HDFC Bank</option>
+                                <option>SBI</option>
+                                <option>ICICI Bank</option>
+                                <option>Axis Bank</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="total-area">
+                    <div>
+                        <div class="price-label">Total Amount</div>
+                        <div class="price-tag" id="totalPrice">$15</div>
+                    </div>
+                    <button class="pay-btn" onclick="processPayment()">PAY NOW</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS MODAL -->
+    <div class="modal" id="successModal">
+        <div class="modal-box">
+            <div class="tick">&#9989;</div>
+            <h2 style="color:#fff; font-family:'Outfit'; font-size:2.5rem; margin-bottom: 10px;">Confirmed!</h2>
+            <p style="color:var(--text-muted); font-size:1.1rem; margin-bottom:30px;">Your VIP tickets have been sent to your email.</p>
+            <button class="pay-btn" style="width:100%;" onclick="window.location.href='index.html'">View Portal</button>
+        </div>
+    </div>
+
+    <script>
+        const starContainer = document.getElementById("stars");
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement("div");
+            star.className = "star";
+            const size = Math.random() * 2 + 1;
+            star.style.width = size + "px"; star.style.height = size + "px";
+            star.style.left = Math.random() * 100 + "vw"; star.style.top = Math.random() * 100 + "vh";
+            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+            star.style.animationDelay = (Math.random() * 5) + 's';
+            starContainer.appendChild(star);
+        }
+
+        const API_KEY = "b0c112fa";
+        const TICKET_PRICE = 15;
+        let count = 0;
+        let selectedSeats = [];
+        let showtime = '10:30 AM';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const imdbID = urlParams.get('id');
+
+        if (imdbID) {
+            fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&i=${imdbID}`)
+                .then(res => res.json())
+                .then(data => {
+                    const poster = (data.Poster !== "N/A") ? data.Poster : "https://via.placeholder.com/300x450/111/fff?text=No+Poster";
+                    document.getElementById("movieInfo").innerHTML = `
+                        <div class="movie-info-bg" style="background-image: url('${poster}')"></div>
+                        <img src="${poster}" class="poster" alt="Poster">
+                        <h2>${data.Title}</h2>
+                        <p class="meta">${data.Year} &nbsp;|&nbsp; ${data.Rated} &nbsp;|&nbsp; ${data.Runtime}</p>
+                        <p class="plot">${data.Plot}</p>
+                    `;
+                });
+        }
+
+        // Generate Seat Map
+        const seatMap = document.getElementById("seatMap");
+        for (let i = 0; i < 40; i++) {
+            const seat = document.createElement("div");
+            seat.className = "seat";
+            // Randomly occupy ~25% seats
+            if (Math.random() < 0.25) {
+                seat.classList.add("occupied");
+            } else {
+                seat.onclick = () => toggleSeat(seat, i);
+            }
+            seatMap.appendChild(seat);
+        }
+
+        function selectTime(el, time) {
+            document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            showtime = time;
+        }
+
+        function toggleSeat(seatEl, seatIndex) {
+            if (seatEl.classList.contains("selected")) {
+                seatEl.classList.remove("selected");
+                selectedSeats = selectedSeats.filter(s => s !== seatIndex);
+            } else {
+                if (selectedSeats.length >= 10) {
+                    alert("Maximum 10 tickets allowed per booking.");
+                    return;
+                }
+                seatEl.classList.add("selected");
+                selectedSeats.push(seatIndex);
+            }
+            updateTotal();
+        }
+
+        function updateTotal() {
+            count = selectedSeats.length;
+            document.getElementById("seatCount").innerText = count;
+            document.getElementById("totalPrice").innerText = "$" + (count * TICKET_PRICE);
+        }
+
+        // Initialize Total Display
+        updateTotal();
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.payment-content').forEach(c => c.classList.add('hide'));
+            document.getElementById(tabId).classList.remove('hide');
+        }
+
+        function processPayment() {
+            if (count === 0) {
+                alert("Please select at least one seat before paying.");
+                return;
+            }
+
+            const btn = document.querySelector('.pay-btn');
+            btn.innerText = "Processing...";
+            btn.style.opacity = 0.7;
+            btn.style.pointerEvents = "none";
+            
+            setTimeout(async () => {
+                document.getElementById("successModal").classList.add("show");
+                
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user) {
+                    try {
+                        await fetch('http://localhost:3000/api/history', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                userId: user.userId,
+                                actionType: 'booking',
+                                details: { tickets: count, total: count * TICKET_PRICE, showtime: showtime, theater: document.getElementById("theaterSelect").value }
+                            })
+                        });
+                    } catch(e) { console.error("History tracking failed", e); }
+                }
+            }, 1500);
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks) {
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user) {
+                    navLinks.innerHTML = `
+                        <a href="index.html">Home</a>
+                        <a href="profile.html" style="color:var(--primary)">Hi, ${user.username}</a>
+                        <a href="#" onclick="logout()">Logout</a>
+                    `;
+                } else {
+                    navLinks.innerHTML = `
+                        <a href="index.html">Home</a>
+                        <a href="login.html">Login</a>
+                        <a href="register.html">Register</a>
+                    `;
+                }
+            }
+        });
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>

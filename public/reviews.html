@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews - CineSphere</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ffd700;
+            --primary-glow: rgba(255, 215, 0, 0.4);
+            --bg-dark: #050505;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 215, 0, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        .ambient-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at 50% 0%, rgba(30, 20, 0, 0.8) 0%, var(--bg-dark) 60%);
+            z-index: -2;
+        }
+
+        #stars { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 0.6);
+            animation: twinkle var(--duration, 4s) ease-in-out infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(0.6) translateY(0); }
+            100% { opacity: 1; transform: scale(1.3) translateY(-5px); }
+        }
+
+        nav {
+            padding: 20px 50px; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100; background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border);
+        }
+        .logo { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; color: var(--text-main); text-decoration: none; }
+        .logo span { color: var(--primary); }
+        .nav-links a { color: var(--text-muted); text-decoration: none; margin-left: 20px; font-weight: 500; font-family: 'Outfit', sans-serif; transition: 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+
+        header { text-align: center; padding: 50px 20px 30px; position: relative; z-index: 10; }
+        header h1 {
+            font-family: 'Outfit', sans-serif; font-size: 3.5rem; font-weight: 800;
+            background: linear-gradient(to right, #fff, #ffe066);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px;
+        }
+        header p { color: var(--text-muted); font-size: 1.1rem; }
+
+        .container {
+            max-width: 900px; margin: 0 auto; padding: 20px 20px 80px; position: relative; z-index: 10;
+        }
+
+        .review {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-left: 4px solid var(--primary);
+            padding: 30px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            transition: 0.3s;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .review:hover {
+            transform: translateX(5px);
+            background: rgba(255, 255, 255, 0.04);
+            border-left-color: #fff;
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.1);
+        }
+
+        .user-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+
+        .user { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.2rem; color: #fff; }
+        .user span { color: var(--text-muted); font-weight: 400; font-size: 1rem; }
+
+        .stars { color: var(--primary); font-size: 1.8rem; letter-spacing: 4px; text-shadow: 0 0 15px rgba(255, 215, 0, 0.8); }
+
+        .text { line-height: 1.7; color: var(--text-muted); font-size: 1.05rem; font-style: italic; }
+        
+        /* Review Form */
+        .review-form {
+            background: rgba(10, 10, 10, 0.6);
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+        }
+        .review-form h3 { font-family: 'Outfit', sans-serif; font-size: 1.5rem; margin-bottom: 15px; color: var(--primary); }
+        .review-form textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            outline: none;
+            transition: 0.3s;
+        }
+        .review-form textarea:focus { border-color: var(--primary); background: rgba(255,255,255,0.08); }
+        .rating-select { font-family: 'Outfit', sans-serif; font-size: 1.1rem; color: #ddd; }
+        .rating-select select {
+            background: rgba(0,0,0,0.8);
+            color: var(--primary);
+            border: 1px solid var(--glass-border);
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            margin-left: 10px;
+        }
+        .submit-btn {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .submit-btn:hover { background: #fff; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); transform: scale(1.05); }
+
+        .empty-reviews { text-align: center; color: var(--text-muted); padding: 40px; font-style: italic; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px dashed var(--glass-border); }
+
+        @media (max-width: 768px) {
+            nav { padding: 20px; }
+            header h1 { font-size: 2.5rem; }
+            .review { padding: 20px; }
+            .user-info { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .review-form .bottom-row { flex-direction: column; gap: 15px; align-items: flex-start; }
+            .submit-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-bg"></div>
+    <div id="stars"></div>
+
+    <nav>
+        <a href="about_us.html" class="logo">CINE<span>SPHERE</span></a>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+        </div>
+    </nav>
+
+    <header>
+        <h1>CINESPHERE REVIEWS</h1>
+        <p>Share your galactic experience with our services</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- Write Review Section -->
+        <div id="loginPrompt" style="display:none; text-align: center; margin-bottom: 40px; color: var(--text-muted); padding: 25px; background: rgba(255,255,255,0.03); border-radius: 16px; border: 1px dashed var(--glass-border);">
+            <a href="login.html" style="color:var(--primary); text-decoration:none; font-weight:800; font-family:'Outfit'; font-size:1.1rem;">Log In</a> to write a review for CineSphere.
+        </div>
+
+        <div class="review-form" id="reviewFormContainer" style="display:none;">
+            <h3>Write a Review</h3>
+            <textarea id="reviewText" placeholder="How was your experience booking tickets or ordering snacks with CineSphere?" rows="4"></textarea>
+            <div class="bottom-row" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                <div class="rating-select">
+                    Rating: 
+                    <select id="reviewRating">
+                        <option value="5">★★★★★ (5/5)</option>
+                        <option value="4">★★★★☆ (4/5)</option>
+                        <option value="3">★★★☆☆ (3/5)</option>
+                        <option value="2">★★☆☆☆ (2/5)</option>
+                        <option value="1">★☆☆☆☆ (1/5)</option>
+                    </select>
+                </div>
+                <button onclick="submitReview()" class="submit-btn" id="submitBtn">Post Review</button>
+            </div>
+        </div>
+
+        <!-- Reviews List -->
+        <div id="reviewsList">
+            <div class="empty-reviews">Loading cosmic transmissions...</div>
+        </div>
+
+    </div>
+
+    <script>
+        const starContainer = document.getElementById("stars");
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement("div");
+            star.className = "star";
+            const size = Math.random() * 2 + 1;
+            star.style.width = size + "px"; star.style.height = size + "px";
+            star.style.left = Math.random() * 100 + "vw"; star.style.top = Math.random() * 100 + "vh";
+            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+            star.style.animationDelay = (Math.random() * 5) + 's';
+            starContainer.appendChild(star);
+        }
+    </script>
+    <script>
+        // Navigation and Authentication Setup
+        document.addEventListener("DOMContentLoaded", () => {
+            const navLinks = document.querySelector('.nav-links');
+            const user = JSON.parse(localStorage.getItem('user'));
+            
+            if (navLinks) {
+                if (user) {
+                    navLinks.innerHTML = `
+                        <a href="index.html">Home</a>
+                        <a href="profile.html" style="color:var(--primary)">Hi, ${user.username}</a>
+                        <a href="#" onclick="logout()">Logout</a>
+                    `;
+                    document.getElementById('reviewFormContainer').style.display = 'block';
+                } else {
+                    navLinks.innerHTML = `
+                        <a href="index.html">Home</a>
+                        <a href="login.html">Login</a>
+                        <a href="register.html">Register</a>
+                    `;
+                    document.getElementById('loginPrompt').style.display = 'block';
+                }
+            }
+
+            loadReviews(); // Initial fetch
+        });
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.reload();
+        }
+
+        // Reviews Logic
+        async function loadReviews() {
+            try {
+                const res = await fetch('http://localhost:3000/api/reviews');
+                const data = await res.json();
+                const list = document.getElementById('reviewsList');
+                
+                if (data.success && data.reviews.length > 0) {
+                    list.innerHTML = '';
+                    data.reviews.forEach(r => {
+                        const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+                        list.innerHTML += `
+                            <div class="review">
+                                <div class="user-info">
+                                    <span class="user">${r.username}</span>
+                                    <span class="stars">${stars}</span>
+                                </div>
+                                <span class="text">"${r.comment}"</span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    list.innerHTML = '<div class="empty-reviews">No reviews yet. Be the first to share your cosmic experience!</div>';
+                }
+            } catch(e) {
+                console.error(e);
+                document.getElementById('reviewsList').innerHTML = '<div class="empty-reviews" style="color:#ff4c4c;">Failed to connect to the celestial servers...</div>';
+            }
+        }
+
+        async function submitReview() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) return alert("Please log in first!");
+
+            const text = document.getElementById('reviewText').value.trim();
+            const rating = document.getElementById('reviewRating').value;
+
+            if (!text) return alert("Please write a review comment!");
+
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Posting...";
+            btn.disabled = true;
+
+            try {
+                await fetch('http://localhost:3000/api/reviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.userId, rating: parseInt(rating), comment: text })
+                });
+                
+                document.getElementById('reviewText').value = '';
+                await loadReviews();
+            } catch(e) {
+                console.error(e);
+                alert("Failed to post review. Is the server running?");
+            }
+
+            btn.innerText = "Post Review";
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>

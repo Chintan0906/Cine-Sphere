@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galactic Snacks - CineSphere</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ffd700;
+            --primary-glow: rgba(255, 215, 0, 0.4);
+            --bg-dark: #050505;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 215, 0, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        .ambient-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at 50% 0%, rgba(30, 20, 0, 0.8) 0%, var(--bg-dark) 60%);
+            z-index: -2;
+        }
+
+        #stars { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 0.6);
+            animation: twinkle var(--duration, 4s) ease-in-out infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(0.6) translateY(0); }
+            100% { opacity: 1; transform: scale(1.3) translateY(-5px); }
+        }
+
+        nav {
+            padding: 20px 50px; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100; background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border);
+        }
+        .logo { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; color: var(--text-main); text-decoration: none; }
+        .logo span { color: var(--primary); }
+        .nav-links a { color: var(--text-muted); text-decoration: none; margin-left: 20px; font-weight: 500; font-family: 'Outfit', sans-serif; transition: 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+
+        header { text-align: center; padding: 50px 20px 30px; position: relative; z-index: 10; }
+        header h1 {
+            font-family: 'Outfit', sans-serif; font-size: 3.5rem; font-weight: 800;
+            background: linear-gradient(to right, #fff, #ffe066);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px;
+        }
+        header p { color: var(--text-muted); font-size: 1.1rem; }
+
+        .container {
+            display: flex; max-width: 1400px; margin: 0 auto; padding: 20px 50px 80px; gap: 40px; position: relative; z-index: 10;
+        }
+        
+        .menu-section { flex: 2; }
+        .tray-section { flex: 1; position: sticky; top: 100px; height: fit-content; }
+
+        .category-title {
+            font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; color: #fff;
+            margin: 0 0 20px; display: flex; align-items: center; gap: 10px; text-transform: uppercase;
+        }
+
+        .category-wrapper { background: var(--glass-bg); padding: 30px; border-radius: 20px; border: 1px solid var(--glass-border); margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+
+        .snacks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+
+        .snack-card {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 20px; text-align: center; transition: 0.3s;
+            cursor: pointer; position: relative; overflow: hidden;
+        }
+        .snack-card:hover {
+            transform: translateY(-5px); border-color: rgba(255, 215, 0, 0.4);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.1); background: rgba(255, 215, 0, 0.05);
+        }
+
+        .emoji-icon { font-size: 3.5rem; margin-bottom: 15px; transition: 0.3s; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
+        .snack-card:hover .emoji-icon { transform: scale(1.1) rotate(5deg); filter: drop-shadow(0 0 15px rgba(255,215,0,0.5)); }
+
+        .snack-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 5px; }
+        .snack-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; min-height: 35px; }
+        .snack-price { font-size: 1.2rem; color: #000; background: var(--primary); font-family: 'Outfit', sans-serif; font-weight: 800; padding: 6px 15px; border-radius: 20px; display: inline-block; }
+
+        /* TRAY */
+        .tray {
+            background: rgba(10, 10, 10, 0.8); border: 1px solid var(--primary); border-radius: 20px;
+            padding: 30px; box-shadow: 0 0 40px rgba(255, 215, 0, 0.1); backdrop-filter: blur(15px);
+        }
+        .tray-header { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; color: #fff; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; }
+        .tray-items { min-height: 100px; max-height: 400px; overflow-y: auto; margin-bottom: 20px; }
+        .tray-items::-webkit-scrollbar { width: 5px; }
+        .tray-items::-webkit-scrollbar-thumb { background: rgba(255, 215, 0, 0.3); border-radius: 3px; }
+
+        .tray-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.05); margin-bottom: 10px; padding: 12px 15px;
+            border-radius: 12px; border: 1px solid var(--glass-border); animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        .item-name { font-weight: 600; font-size: 0.95rem; font-family: 'Outfit', sans-serif; }
+        .item-price { color: var(--primary); font-size: 0.95rem; font-weight: 600; font-family: 'Inter', sans-serif; margin-top: 4px; }
+        .remove-btn { color: #ff4444; cursor: pointer; font-size: 1.1rem; transition: 0.2s; background: rgba(255,68,68,0.1); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        .remove-btn:hover { transform: scale(1.1); background: #ff4444; color: #fff; }
+
+        .total-row { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: 800; font-family: 'Outfit', sans-serif; margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 20px; color: var(--primary); }
+
+        .checkout-btn {
+            width: 100%; background: var(--primary); color: #000; border: none; padding: 16px;
+            font-size: 1.1rem; font-weight: 800; font-family: 'Outfit', sans-serif; border-radius: 50px;
+            cursor: pointer; margin-top: 20px; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .checkout-btn:hover { transform: scale(1.03); box-shadow: 0 0 25px rgba(255, 215, 0, 0.5); }
+        .empty-msg { text-align: center; color: var(--text-muted); padding: 30px; font-style: italic; }
+
+        /* Payment UI inside Tray */
+        .payment-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab { flex: 1; text-align: center; padding: 10px; border: 1px solid var(--glass-border); border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: 0.3s; background: rgba(255,255,255,0.02); }
+        .tab.active { background: rgba(255, 215, 0, 0.15); border-color: var(--primary); color: var(--primary); font-weight: 600; }
+        .tab:hover:not(.active) { background: rgba(255,255,255,0.05); }
+        .payment-content { animation: fadeIn 0.3s ease; text-align: center; }
+        .payment-content.hide { display: none; }
+        .payment-input { width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; border-radius: 8px; outline: none; font-family: 'Inter', sans-serif; transition: 0.3s; }
+        .payment-input:focus { border-color: var(--primary); }
+
+        /* OVERLAY */
+        .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: 0.4s; backdrop-filter: blur(5px); }
+        .overlay.active { opacity: 1; pointer-events: auto; }
+        .success-box { text-align: center; background: rgba(10, 10, 10, 0.95); border: 2px solid var(--primary); padding: 50px; border-radius: 20px; max-width: 400px; box-shadow: 0 0 50px rgba(255, 215, 0, 0.2); transform: translateY(20px); transition: 0.4s; }
+        .overlay.active .success-box { transform: translateY(0); }
+        .success-icon { font-size: 4rem; margin-bottom: 20px; filter: drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
+
+        @media (max-width: 900px) {
+            .container { flex-direction: column; padding: 20px; }
+            .tray-section { position: relative; top: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-bg"></div>
+    <div id="stars"></div>
+
+    <nav>
+        <a href="about_us.html" class="logo">CINE<span>SPHERE</span></a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+        </div>
+    </nav>
+
+    <header>
+        <h1>INTERGALACTIC CONCESSIONS</h1>
+        <p>Fuel up for your cinematic journey with premium snacks</p>
+    </header>
+
+    <div class="container">
+        <!-- MENU -->
+        <div class="menu-section">
+            <div class="category-wrapper">
+                <h2 class="category-title">🔥 Popular Combos</h2>
+                <div class="snacks-grid">
+                    <div class="snack-card" onclick="addToTray('Movie Night Combo', 12.00)">
+                        <div class="emoji-icon">🍿🥤</div>
+                        <div class="snack-title">Movie Night Combo</div>
+                        <div class="snack-desc">Large Popcorn + 2 Large Sodas</div>
+                        <div class="snack-price">$12.00</div>
+                    </div>
+                    <div class="snack-card" onclick="addToTray('Family Feast', 25.00)">
+                        <div class="emoji-icon">👨‍👩‍👧‍👦</div>
+                        <div class="snack-title">Family Feast</div>
+                        <div class="snack-desc">2 Large Popcorns + 4 Drinks + Nachos</div>
+                        <div class="snack-price">$25.00</div>
+                    </div>
+                    <div class="snack-card" onclick="addToTray('Sweet & Salty', 10.00)">
+                        <div class="emoji-icon">🍿🍫</div>
+                        <div class="snack-title">Sweet & Salty</div>
+                        <div class="snack-desc">Medium Popcorn + Candy Bar</div>
+                        <div class="snack-price">$10.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-wrapper">
+                <h2 class="category-title">🍿 Classics</h2>
+                <div class="snacks-grid">
+                    <div class="snack-card" onclick="addToTray('Large Popcorn', 8.50)">
+                        <div class="emoji-icon">🍿</div>
+                        <div class="snack-title">Large Popcorn</div>
+                        <div class="snack-desc">Classic buttered goodness</div>
+                        <div class="snack-price">$8.50</div>
+                    </div>
+                    <div class="snack-card" onclick="addToTray('Loaded Nachos', 9.00)">
+                        <div class="emoji-icon">🧀</div>
+                        <div class="snack-title">Loaded Nachos</div>
+                        <div class="snack-desc">Cheese, jalapenos, and salsa</div>
+                        <div class="snack-price">$9.00</div>
+                    </div>
+                    <div class="snack-card" onclick="addToTray('Hot Dog', 7.00)">
+                        <div class="emoji-icon">🌭</div>
+                        <div class="snack-title">Classic Hot Dog</div>
+                        <div class="snack-desc">Mustard & ketchup optional</div>
+                        <div class="snack-price">$7.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-wrapper">
+                <h2 class="category-title">🥤 Drinks & Treats</h2>
+                <div class="snacks-grid">
+                    <div class="snack-card" onclick="addToTray('Large Soda', 5.00)">
+                        <div class="emoji-icon">🥤</div>
+                        <div class="snack-title">Large Soda</div>
+                        <div class="snack-desc">Coke, Sprite, or Fanta</div>
+                        <div class="snack-price">$5.00</div>
+                    </div>
+                    <div class="snack-card" onclick="addToTray('Frozen Slushie', 6.00)">
+                        <div class="emoji-icon">🍧</div>
+                        <div class="snack-title">Frozen Slushie</div>
+                        <div class="snack-desc">Blue Raspberry or Cherry</div>
+                        <div class="snack-price">$6.00</div>
+                    </div>
+                    <div class="snack-card" onclick="addToTray('Choco Bar', 4.00)">
+                        <div class="emoji-icon">🍫</div>
+                        <div class="snack-title">Premium Choco Bar</div>
+                        <div class="snack-desc">Dark or Milk Chocolate</div>
+                        <div class="snack-price">$4.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TRAY (Cart) -->
+        <div class="tray-section">
+            <div class="tray">
+                <div class="tray-header">
+                    <span>Your Tray</span>
+                    <span>🛒</span>
+                </div>
+                <div class="tray-items" id="trayItems">
+                    <div class="empty-msg">Your tray is empty.<br>Click snacks to add!</div>
+                </div>
+                
+                <div class="payment-section" id="paymentSection" style="display:none; margin-top:15px; padding-top:15px; border-top:1px solid var(--glass-border);">
+                    <label style="font-family:'Outfit'; font-weight:600; color:#fff; font-size:1rem; margin-bottom:10px; display:block;">Select Payment</label>
+                    <div class="payment-tabs">
+                        <div class="tab active" onclick="switchPaymentTab('qr')">QR Code</div>
+                        <div class="tab" onclick="switchPaymentTab('upi')">UPI</div>
+                        <div class="tab" onclick="switchPaymentTab('net')">Net Bank</div>
+                    </div>
+
+                    <div id="qr" class="payment-content">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=CineSphereSnacks" alt="QR Code" style="border-radius:10px; border:3px solid #fff; padding:5px; background:#fff;">
+                        <p style="color:var(--text-muted); font-size: 0.85rem; margin-top:10px;">Scan to pay instantly</p>
+                    </div>
+
+                    <div id="upi" class="payment-content hide">
+                        <input type="text" class="payment-input" placeholder="example@upi">
+                    </div>
+
+                    <div id="net" class="payment-content hide">
+                        <select class="payment-input" style="color:#aaa;">
+                            <option>HDFC Bank</option>
+                            <option>SBI</option>
+                            <option>ICICI Bank</option>
+                            <option>Axis Bank</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="total-row">
+                    <span>Total</span>
+                    <span id="totalPrice">$0.00</span>
+                </div>
+                <button class="checkout-btn" onclick="checkout()">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS OVERLAY -->
+    <div class="overlay" id="overlay">
+        <div class="success-box">
+            <div class="success-icon">🚀</div>
+            <h2 style="color:#ffd700; font-family:'Outfit'; font-weight:800; font-size: 2.2rem; margin-bottom: 5px;">Order Confirmed!</h2>
+            <p style="color:var(--text-muted); margin: 15px 0 25px; font-size: 1.1rem;">Your snacks will be delivered to your seat.</p>
+            <button class="checkout-btn" onclick="closeOverlay()">Awesome!</button>
+        </div>
+    </div>
+
+    <script>
+        const starContainer = document.getElementById("stars");
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement("div");
+            star.className = "star";
+            const size = Math.random() * 2 + 1;
+            star.style.width = size + "px"; star.style.height = size + "px";
+            star.style.left = Math.random() * 100 + "vw"; star.style.top = Math.random() * 100 + "vh";
+            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+            star.style.animationDelay = (Math.random() * 5) + 's';
+            starContainer.appendChild(star);
+        }
+
+        let cart = [];
+
+        function addToTray(name, price) {
+            cart.push({ name, price });
+            updateTray();
+        }
+
+        function removeFromTray(index) {
+            cart.splice(index, 1);
+            updateTray();
+        }
+
+        function updateTray() {
+            const tray = document.getElementById("trayItems");
+            const totalEl = document.getElementById("totalPrice");
+            tray.innerHTML = "";
+            let total = 0;
+
+            if (cart.length === 0) {
+                tray.innerHTML = "<div class='empty-msg'>Your tray is empty.<br>Click snacks to add!</div>";
+                totalEl.innerText = "$0.00";
+                document.getElementById('paymentSection').style.display = 'none';
+                document.querySelector('.tray .checkout-btn').innerText = "Checkout";
+                return;
+            }
+
+            cart.forEach((item, index) => {
+                total += item.price;
+                tray.innerHTML += `
+                    <div class="tray-item">
+                        <div style="display: flex; flex-direction: column;">
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-price">$${item.price.toFixed(2)}</span>
+                        </div>
+                        <div class="remove-btn" onclick="removeFromTray(${index})">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </div>
+                    </div>
+                `;
+            });
+
+            totalEl.innerText = "$" + total.toFixed(2);
+        }
+
+        function switchPaymentTab(tabId) {
+            document.querySelectorAll('.payment-tabs .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.payment-content').forEach(c => c.classList.add('hide'));
+            document.getElementById(tabId).classList.remove('hide');
+        }
+
+        async function checkout() {
+            if (cart.length === 0) {
+                alert("Your tray is empty!");
+                return;
+            }
+
+            const paymentSection = document.getElementById('paymentSection');
+            const btn = document.querySelector('.tray .checkout-btn');
+
+            if (paymentSection.style.display === 'none') {
+                paymentSection.style.display = 'block';
+                btn.innerText = "PAY NOW";
+                return;
+            }
+            
+            btn.innerText = "Processing Details...";
+            btn.style.pointerEvents = "none";
+            btn.style.opacity = "0.7";
+
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                try {
+                    const items = cart.map(item => item.name);
+                    const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
+
+                    await fetch('http://localhost:3000/api/history', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId: user.userId,
+                            actionType: 'snacks',
+                            details: { items: items, total: totalAmount }
+                        })
+                    });
+                } catch(e) { console.error("History tracking failed", e); }
+            }
+
+            btn.innerText = "Checkout";
+            btn.style.pointerEvents = "auto";
+            btn.style.opacity = "1";
+            paymentSection.style.display = 'none';
+            document.getElementById("overlay").classList.add("active");
+        }
+
+        function closeOverlay() {
+            document.getElementById("overlay").classList.remove("active");
+            cart = [];
+            updateTray();
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks) {
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user) {
+                    navLinks.innerHTML = `
+                        <a href="index.html">Home</a>
+                        <a href="profile.html" style="color:var(--primary)">Hi, ${user.username}</a>
+                        <a href="#" onclick="logout()">Logout</a>
+                    `;
+                } else {
+                    navLinks.innerHTML = `
+                        <a href="index.html">Home</a>
+                        <a href="login.html">Login</a>
+                        <a href="register.html">Register</a>
+                    `;
+                }
+            }
+        });
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
