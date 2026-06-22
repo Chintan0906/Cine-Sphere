@@ -336,7 +336,8 @@ app.get('/api/test-db', (req, res) => {
         dbExists: fs.existsSync(dbPath),
         env: {
             VERCEL: process.env.VERCEL,
-            NODE_ENV: process.env.NODE_ENV
+            NODE_ENV: process.env.NODE_ENV,
+            N8N_URL: process.env.N8N_URL
         }
     });
 });
