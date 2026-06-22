@@ -17,9 +17,30 @@ app.use(bodyParser.json());
 // ✅ FIX 2: Serve frontend correctly
 app.use(express.static(path.join(__dirname, '../public')));
 
-// ✅ FIX 3: Correct database path
+// ✅ FIX 3: Correct database path with Vercel /tmp fallback
+const fs = require('fs');
+let dbPath = path.join(__dirname, '../database/database.sqlite');
+
+if (process.env.VERCEL) {
+    const tmpDbPath = '/tmp/database.sqlite';
+    const dbDir = path.dirname(tmpDbPath);
+    if (!fs.existsSync(dbDir)) {
+        fs.mkdirSync(dbDir, { recursive: true });
+    }
+    // Copy database to writeable /tmp folder if it doesn't exist
+    if (!fs.existsSync(tmpDbPath)) {
+        try {
+            fs.copyFileSync(dbPath, tmpDbPath);
+            console.log("Copied template database to /tmp/database.sqlite");
+        } catch (e) {
+            console.error("Failed to copy database to /tmp", e);
+        }
+    }
+    dbPath = tmpDbPath;
+}
+
 const db = new sqlite3.Database(
-    path.join(__dirname, '../database/database.sqlite'),
+    dbPath,
     (err) => {
         if (err) {
             console.error("Error opening database: " + err.message);
@@ -226,6 +247,10 @@ app.post('/api/movies', async (req, res) => {
     }
 });
 // Start server
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+    });
+}
+
+module.exports = app;
