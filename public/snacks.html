@@ -4,61 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galactic Snacks - CineSphere</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/global.css">
+    <script src="scripts/auth.js"></script>
     <style>
-        :root {
-            --primary: #ffd700;
-            --primary-glow: rgba(255, 215, 0, 0.4);
-            --bg-dark: #050505;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --text-main: #ffffff;
-            --text-muted: #a0a0a0;
+        .nebula-bg {
+            background: 
+                radial-gradient(circle at 50% 0%, rgba(255, 215, 0, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 10% 30%, rgba(255, 140, 0, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 70%, rgba(255, 215, 0, 0.05) 0%, transparent 45%) !important;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 215, 0, 0.5); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-
-        .ambient-bg {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: radial-gradient(circle at 50% 0%, rgba(30, 20, 0, 0.8) 0%, var(--bg-dark) 60%);
-            z-index: -2;
-        }
-
-        #stars { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
-        .star {
-            position: absolute;
-            background: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 0.6);
-            animation: twinkle var(--duration, 4s) ease-in-out infinite alternate;
-        }
-        @keyframes twinkle {
-            0% { opacity: 0.2; transform: scale(0.6) translateY(0); }
-            100% { opacity: 1; transform: scale(1.3) translateY(-5px); }
-        }
-
-        nav {
-            padding: 20px 50px; display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100; background: rgba(5, 5, 5, 0.8);
-            backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border);
-        }
-        .logo { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; color: var(--text-main); text-decoration: none; }
-        .logo span { color: var(--primary); }
-        .nav-links a { color: var(--text-muted); text-decoration: none; margin-left: 20px; font-weight: 500; font-family: 'Outfit', sans-serif; transition: 0.3s; }
-        .nav-links a:hover { color: var(--primary); }
 
         header { text-align: center; padding: 50px 20px 30px; position: relative; z-index: 10; }
         header h1 {
@@ -69,7 +23,7 @@
         header p { color: var(--text-muted); font-size: 1.1rem; }
 
         .container {
-            display: flex; max-width: 1400px; margin: 0 auto; padding: 20px 50px 80px; gap: 40px; position: relative; z-index: 10;
+            display: flex; width: 100%; max-width: 1400px; margin: 0 auto; padding: 20px 50px 80px; gap: 40px; position: relative; z-index: 10;
         }
         
         .menu-section { flex: 2; }
@@ -85,13 +39,15 @@
         .snacks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
 
         .snack-card {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);
-            border-radius: 16px; padding: 20px; text-align: center; transition: 0.3s;
-            cursor: pointer; position: relative; overflow: hidden;
+            background: rgba(255, 255, 255, 0.05) !important; border: 1px solid var(--glass-border) !important;
+            border-radius: 16px !important; padding: 20px !important; text-align: center !important; transition: all 0.3s ease !important;
+            cursor: pointer !important; position: relative !important; overflow: hidden !important;
+            transform: none !important;
+            transform-style: flat !important;
         }
         .snack-card:hover {
-            transform: translateY(-5px); border-color: rgba(255, 215, 0, 0.4);
-            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.1); background: rgba(255, 215, 0, 0.05);
+            transform: translateY(-5px) !important; border-color: rgba(255, 215, 0, 0.4) !important;
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.1) !important; background: rgba(255, 215, 0, 0.05) !important;
         }
 
         .emoji-icon { font-size: 3.5rem; margin-bottom: 15px; transition: 0.3s; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
@@ -157,24 +113,41 @@
         }
     </style>
 </head>
-<body>
+<body class="fixed-viewport-body">
 
     <div class="ambient-bg"></div>
     <div id="stars"></div>
 
     <nav>
-        <a href="about_us.html" class="logo">CINE<span>SPHERE</span></a>
+        <a href="index.html" class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" stroke="url(#logoGrad)" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="4" fill="url(#logoGrad)"/>
+                    <path d="M12 2v6M12 16v6M2 12h6M16 12h6" stroke="url(#logoGrad)" stroke-width="1.5"/>
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#fff176" />
+                            <stop offset="50%" stop-color="#ffd700" />
+                            <stop offset="100%" stop-color="#ffb300" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            CINE<span>SPHERE</span>
+        </a>
         <div class="nav-links">
-            <a href="index.html">Home</a>
+            <!-- Dynamic links injected by auth.js -->
         </div>
     </nav>
 
-    <header>
-        <h1>INTERGALACTIC CONCESSIONS</h1>
-        <p>Fuel up for your cinematic journey with premium snacks</p>
-    </header>
+    <div class="scroll-container">
+        <header>
+            <h1>INTERGALACTIC CONCESSIONS</h1>
+            <p>Fuel up for your cinematic journey with premium snacks</p>
+        </header>
 
-    <div class="container">
+        <div class="container">
         <!-- MENU -->
         <div class="menu-section">
             <div class="category-wrapper">
@@ -396,7 +369,7 @@
                     const items = cart.map(item => item.name);
                     const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
 
-                    await fetch('http://localhost:3000/api/history', {
+                    await fetch('/api/history', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -421,30 +394,7 @@
             updateTray();
         }
     </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const navLinks = document.querySelector('.nav-links');
-            if (navLinks) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                if (user) {
-                    navLinks.innerHTML = `
-                        <a href="index.html">Home</a>
-                        <a href="profile.html" style="color:var(--primary)">Hi, ${user.username}</a>
-                        <a href="#" onclick="logout()">Logout</a>
-                    `;
-                } else {
-                    navLinks.innerHTML = `
-                        <a href="index.html">Home</a>
-                        <a href="login.html">Login</a>
-                        <a href="register.html">Register</a>
-                    `;
-                }
-            }
-        });
-        function logout() {
-            localStorage.removeItem('user');
-            window.location.reload();
-        }
-    </script>
+    </div>
+    <!-- Dynamic nav scripts handled by auth.js -->
 </body>
 </html>

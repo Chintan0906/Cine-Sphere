@@ -4,50 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CineSphere - Premium Cinematic Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/global.css">
+    <script src="scripts/auth.js"></script>
     <style>
-        :root {
-            --primary: #ffd700;
-            --primary-glow: rgba(255, 215, 0, 0.4);
-            --bg-dark: #050505;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --text-main: #ffffff;
-            --text-muted: #a0a0a0;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            overflow-x: hidden;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
             perspective: 1000px;
-        }
-
-        /* Dynamic Background */
-        .ambient-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: radial-gradient(circle at 50% 0%, rgba(30, 20, 0, 0.8) 0%, var(--bg-dark) 60%);
-            z-index: -2;
-        }
-
-        #stars { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
-        .star {
-            position: absolute;
-            background: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 0.6);
-            animation: twinkle var(--duration, 4s) ease-in-out infinite alternate;
-        }
-        @keyframes twinkle {
-            0% { opacity: 0.2; transform: scale(0.6) translateY(0); }
-            100% { opacity: 1; transform: scale(1.3) translateY(-5px); }
         }
 
         /* Mouse Glow */
@@ -63,47 +24,98 @@
             transition: opacity 0.3s ease;
         }
 
-        /* Navigation */
-        nav {
-            padding: 30px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Trending Section Styling */
+        .trending-section {
+            max-width: 1400px;
+            margin: 60px auto 100px;
+            padding: 0 50px;
             position: relative;
             z-index: 10;
         }
-
-        .logo {
-            font-family: 'Outfit', sans-serif;
-            font-size: 2rem;
+        .section-title {
+            font-family: var(--font-outfit);
+            font-size: 2.2rem;
             font-weight: 800;
             letter-spacing: 2px;
-            color: var(--text-main);
+            margin-bottom: 40px;
+            text-align: center;
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.15));
+        }
+        .trending-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+        .trending-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex;
+            flex-direction: column;
             text-decoration: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .trending-card:hover {
+            border-color: rgba(255, 215, 0, 0.3);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.1);
+        }
+        .trending-poster {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            transition: 0.5s ease;
+        }
+        .trending-card:hover .trending-poster {
+            transform: scale(1.05);
+        }
+        .trending-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .trending-title {
+            font-family: var(--font-outfit);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        .trending-genre {
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .trending-rating {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .imdb-rating {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 5px;
+            color: #ffd700;
+            font-weight: 700;
         }
 
-        .logo span { color: var(--primary); }
-
-        .nav-links { display: flex; align-items: center; }
-        .nav-links a { color: var(--text-muted); text-decoration: none; margin-left: 30px; font-weight: 500; font-family: 'Outfit', sans-serif; transition: 0.3s; font-size: 1.1rem; }
-        .nav-links a:hover { color: var(--primary); }
-        .nav-links a.btn-register {
-            background: rgba(255, 215, 0, 0.1);
-            color: var(--primary);
-            padding: 8px 24px;
-            border-radius: 30px;
-            border: 1px solid var(--primary);
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.1);
-            margin-left: 20px;
+        @media (max-width: 1200px) {
+            .trending-grid { grid-template-columns: repeat(2, 1fr); }
         }
-        .nav-links a.btn-register:hover {
-            background: var(--primary);
-            color: #000;
-            box-shadow: 0 0 20px var(--primary-glow);
-            transform: translateY(-2px);
+        @media (max-width: 600px) {
+            .trending-grid { grid-template-columns: 1fr; }
+            .trending-section { padding: 0 20px; margin-bottom: 60px; }
         }
 
         /* Hero */
@@ -272,9 +284,25 @@
     <div id="stars"></div>
 
     <nav>
-        <a href="about_us.html" class="logo">CINE<span>SPHERE</span></a>
+        <a href="index.html" class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" stroke="url(#logoGrad)" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="4" fill="url(#logoGrad)"/>
+                    <path d="M12 2v6M12 16v6M2 12h6M16 12h6" stroke="url(#logoGrad)" stroke-width="1.5"/>
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#fff176" />
+                            <stop offset="50%" stop-color="#ffd700" />
+                            <stop offset="100%" stop-color="#ffb300" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            CINE<span>SPHERE</span>
+        </a>
         <div class="nav-links">
-            <a href="index.html">Home</a>
+            <!-- Dynamic links injected by auth.js -->
         </div>
     </nav>
 
@@ -331,6 +359,14 @@
         </div>
     </div>
 
+    <!-- TRENDING MOVIES SECTION -->
+    <section class="trending-section">
+        <h2 class="section-title">TRENDING IN THE UNIVERSE</h2>
+        <div class="trending-grid" id="trendingGrid">
+            <div class="loading-state" style="grid-column:1/-1; text-align:center; font-family:'Outfit'; color:var(--text-muted); font-size:1.2rem; padding:40px;">Loading stellar projections...</div>
+        </div>
+    </section>
+
     <script>
         // Smooth Cursor Glow
         const cursorGlow = document.getElementById('cursorGlow');
@@ -353,65 +389,40 @@
         }
         animateGlow();
 
-        // 3D Card Hover Effect
-        const cards = document.querySelectorAll('.card');
-        cards.forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                const rotateX = ((y - centerY) / centerY) * -10;
-                const rotateY = ((x - centerX) / centerX) * 10;
-                
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-            });
-
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-            });
-        });
-
-        // Interactive Stardust Canvas Replacement
-        const starContainer = document.getElementById("stars");
-        for (let i = 0; i < 200; i++) {
-            const star = document.createElement("div");
-            star.className = "star";
-            const size = Math.random() * 2 + 1;
-            star.style.width = size + "px";
-            star.style.height = size + "px";
-            star.style.left = Math.random() * 100 + "vw";
-            star.style.top = Math.random() * 100 + "vh";
-            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
-            star.style.animationDelay = (Math.random() * 5) + 's';
-            starContainer.appendChild(star);
-        }
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const navLinks = document.querySelector('.nav-links');
-            if (navLinks) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                if (user) {
-                    navLinks.innerHTML = `
-                        <a href="profile.html" style="color:var(--primary)">Hi, ${user.username}</a>
-                        <a href="#" onclick="logout()" class="btn-register">Logout</a>
-                    `;
-                } else {
-                    navLinks.innerHTML = `
-                        <a href="login.html">Login</a>
-                        <a href="register.html" class="btn-register">Register</a>
-                    `;
+        // Fetch Trending Movies
+        async function loadTrendingMovies() {
+            const movies = ["Interstellar", "Dune: Part Two", "Spider-Man: Into the Spider-Verse", "Everything Everywhere All at Once"];
+            const grid = document.getElementById('trendingGrid');
+            if (!grid) return;
+            
+            try {
+                grid.innerHTML = "";
+                for (let title of movies) {
+                    const res = await fetch(`https://www.omdbapi.com/?apikey=b0c112fa&t=${encodeURIComponent(title)}`);
+                    const data = await res.json();
+                    
+                    if (data.Response === "True") {
+                        grid.innerHTML += `
+                            <a href="book_tickets.html?search=${encodeURIComponent(title)}" class="trending-card">
+                                <img src="${data.Poster}" alt="${data.Title}" class="trending-poster">
+                                <div class="trending-content">
+                                    <div class="trending-title">${data.Title}</div>
+                                    <div class="trending-genre">${data.Genre.split(',')[0]}</div>
+                                    <div class="trending-rating">
+                                        <span>${data.Year}</span>
+                                        <span class="imdb-rating">⭐ ${data.imdbRating}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    }
                 }
+            } catch (err) {
+                console.error("Error loading trending movies", err);
+                grid.innerHTML = "<div class='loading-state'>Stellar transmissions offline...</div>";
             }
-        });
-        function logout() {
-            localStorage.removeItem('user');
-            window.location.reload();
         }
+        loadTrendingMovies();
     </script>
 </body>
 </html>
