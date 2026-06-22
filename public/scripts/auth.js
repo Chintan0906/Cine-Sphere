@@ -264,7 +264,7 @@
 
     // 6. Global 3D Parallax Card Tilt Function
     function init3DTilt() {
-        const tiltElements = document.querySelectorAll('.card, .movie-card, .snack-card, .history-card, .auth-box, .about-card, .review-form, .booking-form, .checkout-container, .trending-card');
+        const tiltElements = document.querySelectorAll('.card, .snack-card, .history-card, .auth-box, .about-card, .review-form, .trending-card');
         tiltElements.forEach(el => {
             el.addEventListener('mousemove', (e) => {
                 const rect = el.getBoundingClientRect();
