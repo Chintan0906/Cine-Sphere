@@ -714,7 +714,7 @@ footer {
 
 @media (max-width: 480px) {
     .movie-grid, .movies-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+        grid-template-columns: repeat(2, 1fr) !important;
         gap: 15px !important;
         padding: 10px 0 80px !important;
     }
