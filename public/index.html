@@ -181,7 +181,62 @@
         }
 
         @media (max-width: 1200px) { .grid { grid-template-columns: repeat(2, 1fr); gap: 40px; } }
-        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } .hero h1 { font-size: 3rem; } }
+        @media (max-width: 768px) {
+            .card-content {
+                transform: translateY(0) !important;
+                padding: 20px !important;
+            }
+            .card-desc {
+                opacity: 0.95 !important;
+                transform: translateY(0) !important;
+                font-size: 0.9rem !important;
+            }
+            .card-title {
+                font-size: 1.5rem !important;
+            }
+            .card {
+                height: 260px !important;
+                border-radius: 16px !important;
+            }
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .hero {
+                margin-top: 40px;
+            }
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            .hero p {
+                font-size: 0.95rem;
+            }
+            .card {
+                height: 220px !important;
+            }
+            .card-icon {
+                font-size: 2rem !important;
+                margin-bottom: 10px !important;
+            }
+            .trending-section {
+                padding: 0 15px;
+            }
+            .section-title {
+                font-size: 1.6rem;
+                margin-bottom: 25px;
+            }
+            .trending-poster {
+                height: 240px;
+            }
+            .trending-content {
+                padding: 15px;
+            }
+        }
 
         /* Glass Cards */
         .card {

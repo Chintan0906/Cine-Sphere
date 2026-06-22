@@ -107,6 +107,51 @@
             .review-form .bottom-row { flex-direction: column; gap: 15px; align-items: flex-start; }
             .submit-btn { width: 100%; }
         }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 40px 15px 20px;
+            }
+            header h1 {
+                font-size: 2.2rem;
+            }
+            header p {
+                font-size: 0.95rem;
+            }
+            .container {
+                padding: 10px 10px 60px;
+            }
+            .review {
+                padding: 20px 15px;
+                margin-bottom: 15px;
+            }
+            .stars {
+                font-size: 1.3rem;
+                letter-spacing: 2px;
+            }
+            .text {
+                font-size: 0.95rem;
+            }
+            .review-form {
+                padding: 20px 15px;
+                margin-bottom: 25px;
+            }
+            .review-form h3 {
+                font-size: 1.3rem;
+                margin-bottom: 10px;
+            }
+            .rating-select {
+                font-size: 0.95rem;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
+            }
+            .rating-select select {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
