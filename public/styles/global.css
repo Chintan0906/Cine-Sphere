@@ -13,14 +13,21 @@
     --font-inter: 'Inter', sans-serif;
 }
 
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 html {
     background-color: var(--bg-dark);
+    overflow-x: hidden;
+    width: 100%;
 }
 body {
     font-family: var(--font-inter);
     background-color: transparent;
     color: var(--text-main);
     overflow-x: hidden;
+    width: 100%;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -424,31 +431,49 @@ footer {
 /* Mobile Responsiveness for Header/Navbar & Footer */
 @media (max-width: 768px) {
     nav {
-        padding: 15px 20px;
-        flex-direction: column;
-        gap: 15px;
-        position: relative;
+        padding: 10px 15px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
     }
     .logo {
-        font-size: 1.6rem;
+        font-size: 1.4rem;
+        letter-spacing: 1px;
+    }
+    .logo-icon {
+        width: 26px;
+        height: 26px;
     }
     .nav-links {
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
+        width: auto;
+        justify-content: flex-end;
+        align-items: center;
         gap: 8px;
+        flex-wrap: nowrap;
     }
     .nav-links a {
         margin-left: 0;
-        font-size: 0.95rem;
-        padding: 6px 12px;
+        font-size: 0.85rem;
+        padding: 6px 10px;
     }
     .nav-links a.btn-register {
         margin-left: 0;
-        padding: 6px 16px;
+        padding: 6px 12px;
     }
     .user-profile-badge {
         margin-left: 0;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        gap: 6px;
+    }
+    .profile-avatar {
+        width: 26px;
+        height: 26px;
+        font-size: 0.8rem;
+    }
+    .profile-name {
+        font-size: 0.85rem;
     }
     footer {
         padding: 50px 20px 30px;
@@ -466,6 +491,28 @@ footer {
         flex-direction: column;
         gap: 15px;
         text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        font-size: 1.2rem;
+    }
+    .profile-name {
+        display: none;
+    }
+    .user-profile-badge {
+        padding: 4px !important;
+        border-radius: 50% !important;
+        border-color: var(--glass-border) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+    .nav-links {
+        gap: 4px;
+    }
+    .nav-links a {
+        font-size: 0.8rem;
+        padding: 4px 6px;
     }
 }
 
@@ -669,7 +716,7 @@ footer {
     .movie-grid, .movies-grid {
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
         gap: 15px !important;
-        padding: 10px 0 30px !important;
+        padding: 10px 0 80px !important;
     }
     .movie-card {
         border-radius: 12px !important;
