@@ -63,15 +63,152 @@ if (process.env.VERCEL) {
 
 // In-Memory Database Fallback Data Structures
 let mockUsers = [
-    { id: 1, username: "admin", email: "admin@cinesphere.com", password: bcrypt.hashSync("CineSphereAdmin2026!", 10), is_admin: 1 }
+    { id: 1, username: "admin", email: "admin@cinesphere.com", password: bcrypt.hashSync("CineSphereAdmin2026!", 10), is_admin: 1 },
+    { id: 2, username: "sarah_connor", email: "sarah.connor@sky.net", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 3, username: "tony_stark", email: "tony@starkindustries.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 4, username: "bruce_wayne", email: "bruce@waynecorp.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 5, username: "clark_kent", email: "clark@dailyplanet.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 6, username: "peter_parker", email: "peter.parker@dailybugle.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 7, username: "john_doe", email: "john.doe@gmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 8, username: "jane_smith", email: "jane.smith@yahoo.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 9, username: "david_miller", email: "david.miller@outlook.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 10, username: "emily_davis", email: "emily.davis@hotmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 11, username: "michael_wilson", email: "m.wilson@gmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 12, username: "jessica_taylor", email: "jessica.t@yahoo.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 13, username: "robert_thomas", email: "robert.thomas@live.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 14, username: "linda_jackson", email: "linda.j@mail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 15, username: "william_white", email: "william.white@gmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 16, username: "elizabeth_harris", email: "e.harris@outlook.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 17, username: "joseph_martin", email: "joseph.m@gmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 18, username: "barbara_clark", email: "barbara.c@yahoo.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 19, username: "thomas_rodriguez", email: "thomas.r@hotmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 20, username: "susan_lewis", email: "susan.lewis@gmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 21, username: "christopher_lee", email: "christopher.lee@yahoo.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 22, username: "margaret_walker", email: "margaret.w@gmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 23, username: "matthew_hall", email: "matthew.hall@live.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 24, username: "lisa_allen", email: "lisa.allen@outlook.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
+    { id: 25, username: "chintan_jain", email: "chintan.jain@gmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 }
 ];
 let mockHistory = [];
-let mockReviews = [
-    { id: 2, user_id: 2, username: "NebulaWatcher", rating: 4, comment: "Love the snacks ordering portal. Very responsive and smooth animation effects.", created_at: new Date().toISOString() }
-];
+let mockReviews = [];
 let mockChats = [];
 let mockBookings = [];
 let mockSnacks = [];
+
+// Seed Mock Data dynamically on startup
+(function seedMocks() {
+    const theaters = ["IMAX Nebula", "Stardust Suite", "Solar Hall", "Apollo Theater", "Cosmic Screen"];
+    const showtimes = ["2:30 PM", "5:15 PM", "8:00 PM", "10:45 PM"];
+    const dates = [
+        "2026-07-10 14:32:00", "2026-07-11 17:40:00", "2026-07-12 20:15:00", 
+        "2026-07-13 22:50:00", "2026-07-14 15:20:00", "2026-07-15 18:10:00", 
+        "2026-07-16 20:30:00", "2026-07-17 21:00:00", "2026-07-18 16:45:00"
+    ];
+
+    // Seed Bookings
+    for (let i = 0; i < 30; i++) {
+        const uId = Math.floor(Math.random() * (mockUsers.length - 1)) + 2; // skip admin (id 1)
+        const th = theaters[Math.floor(Math.random() * theaters.length)];
+        const st = showtimes[Math.floor(Math.random() * showtimes.length)];
+        const tix = Math.floor(Math.random() * 4) + 1;
+        const total = tix * 14.50;
+        const dt = dates[Math.floor(Math.random() * dates.length)];
+
+        mockBookings.push({ id: i + 1, user_id: uId, theater: th, showtime: st, tickets: tix, total, created_at: dt });
+        mockHistory.push({
+            id: mockHistory.length + 1,
+            user_id: uId,
+            action_type: 'booking',
+            details: { theater: th, showtime: st, tickets: tix, total },
+            created_at: dt
+        });
+    }
+
+    // Seed Snack Orders
+    const snackMenu = [
+        { name: "Caramel Popcorn", price: 7.50 },
+        { name: "Nachos with Cheese", price: 8.50 },
+        { name: "Galactic Hot Dog", price: 9.00 },
+        { name: "Jumbo Sprite", price: 5.50 },
+        { name: "Coca Cola Medium", price: 4.50 },
+        { name: "Choc Bar Ice Cream", price: 4.00 }
+    ];
+
+    for (let i = 0; i < 30; i++) {
+        const uId = Math.floor(Math.random() * (mockUsers.length - 1)) + 2;
+        const itemCount = Math.floor(Math.random() * 3) + 1;
+        const items = [];
+        let total = 0;
+        for (let j = 0; j < itemCount; j++) {
+            const sn = snackMenu[Math.floor(Math.random() * snackMenu.length)];
+            items.push(sn.name);
+            total += sn.price;
+        }
+        const dt = dates[Math.floor(Math.random() * dates.length)];
+
+        mockSnacks.push({ id: i + 1, user_id: uId, items, total, created_at: dt });
+        mockHistory.push({
+            id: mockHistory.length + 1,
+            user_id: uId,
+            action_type: 'snacks',
+            details: { items, total },
+            created_at: dt
+        });
+    }
+
+    // Seed Reviews
+    const reviewTemplates = [
+        { rating: 5, comment: "Dune Part Two is a cinematic miracle! The sound design was spectacular." },
+        { rating: 4, comment: "Inception leaves you questioning reality. Absolutely loved the pacing." },
+        { rating: 5, comment: "Interstellar is my absolute favorite. Cried twice. Hans Zimmer did a fantastic job." },
+        { rating: 3, comment: "The movie had a great first half but the ending felt rushed." },
+        { rating: 5, comment: "Oppenheimer is a masterclass in tension and cinematography." },
+        { rating: 4, comment: "A solid sci-fi thriller. Kept me on the edge of my seat." },
+        { rating: 2, comment: "Too long and repetitive. Beautiful visual elements, but no soul." },
+        { rating: 5, comment: "Everything Everywhere All at Once is absolutely genius!" },
+        { rating: 4, comment: "Visually stunning. The plot was simple but executed very well." },
+        { rating: 5, comment: "The Matrix remains the absolute pinnacle of sci-fi action." }
+    ];
+
+    for (let i = 0; i < 20; i++) {
+        const uId = Math.floor(Math.random() * (mockUsers.length - 1)) + 2;
+        const template = reviewTemplates[i % reviewTemplates.length];
+        const dt = dates[Math.floor(Math.random() * dates.length)];
+
+        mockReviews.push({ id: i + 1, user_id: uId, rating: template.rating, comment: template.comment, created_at: dt });
+        mockHistory.push({
+            id: mockHistory.length + 1,
+            user_id: uId,
+            action_type: 'review',
+            details: { rating: template.rating, comment: template.comment },
+            created_at: dt
+        });
+    }
+
+    // Seed Chats
+    const chatLogs = [
+        { msg: "recommend some space movies", res: { type: "movies", movies: [{ name: "Interstellar", genre: "Sci-Fi", reason: "Profound cosmic themes" }, { name: "Gravity", genre: "Thriller", reason: "Intense survival story" }] } },
+        { msg: "what is the plot of inception", res: { type: "details", title: "Inception", year: "2010", genre: "Sci-Fi", summary: "Thieves enter dream worlds to steal secrets.", cast: ["Leonardo DiCaprio", "Elliot Page"], director: "Christopher Nolan" } },
+        { msg: "tell me about Oppenheimer", res: { type: "details", title: "Oppenheimer", year: "2023", genre: "Biography/Drama", summary: "The development of the nuclear bomb.", cast: ["Cillian Murphy", "Emily Blunt"], director: "Christopher Nolan" } },
+        { msg: "recommend comedy movies", res: { type: "text", message: "Here are some top comedies: Superbad, Groundhog Day, and The Hangover." } },
+        { msg: "is Dune available?", res: { type: "text", message: "Yes, Dune Part One and Part Two are available for ticket booking in IMAX." } },
+        { msg: "which theater has best audio?", res: { type: "text", message: "IMAX Nebula features full Dolby Atmos surround sound system." } }
+    ];
+
+    for (let i = 0; i < 25; i++) {
+        const uId = Math.floor(Math.random() * mockUsers.length) + 1;
+        const template = chatLogs[i % chatLogs.length];
+        const dt = dates[Math.floor(Math.random() * dates.length)];
+
+        mockChats.push({
+            id: i + 1,
+            user_id: uId % 2 === 0 ? uId : null,
+            user_message: template.msg,
+            bot_response: JSON.stringify(template.res),
+            created_at: dt
+        });
+    }
+})();
 
 let db;
 let chatbotDb;
