@@ -91,6 +91,21 @@
             </button>
         </header>
 
+        <!-- Analytics Export Section -->
+        <div class="stat-card" style="margin-bottom: 30px; text-align: left; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <h3 style="font-family: 'Outfit', sans-serif; color: #fff; margin-bottom: 5px; font-size: 1.4rem;">📥 Data Analytics Export Center</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;">Export all tables as clean CSV files to load into Python, Excel, PowerBI, or Tableau.</p>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="view-btn" onclick="exportData('users')" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 600;">Users CSV</button>
+                <button class="view-btn" onclick="exportData('bookings')" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 600;">Bookings CSV</button>
+                <button class="view-btn" onclick="exportData('snacks')" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 600;">Snack Orders CSV</button>
+                <button class="view-btn" onclick="exportData('reviews')" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 600;">Reviews CSV</button>
+                <button class="view-btn" onclick="exportData('chats')" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 600;">Chatbot Logs CSV</button>
+            </div>
+        </div>
+
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
@@ -266,6 +281,10 @@
                 loadAdminDashboard();
             }
         });
+
+        function exportData(table) {
+            window.location.href = `/api/admin/export/${table}?adminId=${adminId}`;
+        }
 
         async function fetchAdminData(endpoint) {
             try {

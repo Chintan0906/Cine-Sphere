@@ -701,6 +701,86 @@ app.get('/api/admin/chats', validateAdmin, (req, res) => {
     }
 });
 
+// CSV Helper Exporter
+const jsonToCsv = (items) => {
+    if (!items || items.length === 0) return '';
+    const header = Object.keys(items[0]);
+    const csv = [
+        header.join(','),
+        ...items.map(row => header.map(fieldName => {
+            let val = row[fieldName];
+            if (typeof val === 'object' && val !== null) {
+                val = JSON.stringify(val);
+            }
+            const valStr = String(val === null || val === undefined ? '' : val).replace(/"/g, '""');
+            return `"${valStr}"`;
+        }).join(','))
+    ].join('\r\n');
+    return csv;
+};
+
+// Admin CSV Export Endpoint
+app.get('/api/admin/export/:table', validateAdmin, (req, res) => {
+    const { table } = req.params;
+
+    if (table === 'chats') {
+        if (chatbotDb) {
+            chatbotDb.all(`SELECT * FROM chats ORDER BY created_at DESC`, [], (err, rows) => {
+                if (err) return res.status(500).json({ error: err.message });
+                try {
+                    const parsed = rows.map(r => ({
+                        ...r,
+                        bot_response: JSON.parse(r.bot_response)
+                    }));
+                    res.setHeader('Content-Type', 'text/csv');
+                    res.setHeader('Content-Disposition', 'attachment; filename=chatbot_logs.csv');
+                    return res.send(jsonToCsv(parsed));
+                } catch (e) {
+                    return res.status(500).json({ error: "Failed to export chat logs: " + e.message });
+                }
+            });
+        } else {
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', 'attachment; filename=chatbot_logs.csv');
+            return res.send('');
+        }
+        return;
+    }
+
+    let query = '';
+    let filename = '';
+    if (table === 'users') {
+        query = 'SELECT id, username, email, is_admin FROM users';
+        filename = 'users.csv';
+    } else if (table === 'bookings') {
+        query = 'SELECT bookings.*, users.username FROM bookings JOIN users ON bookings.user_id = users.id ORDER BY bookings.created_at DESC';
+        filename = 'bookings.csv';
+    } else if (table === 'snacks') {
+        query = 'SELECT snacks.*, users.username FROM snacks JOIN users ON snacks.user_id = users.id ORDER BY snacks.created_at DESC';
+        filename = 'concession_orders.csv';
+    } else if (table === 'reviews') {
+        query = 'SELECT reviews.*, users.username FROM reviews JOIN users ON reviews.user_id = users.id ORDER BY reviews.created_at DESC';
+        filename = 'reviews.csv';
+    } else {
+        return res.status(400).json({ error: "Invalid table name" });
+    }
+
+    db.all(query, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        
+        if (table === 'snacks') {
+            rows = rows.map(r => ({
+                ...r,
+                items: JSON.parse(r.items)
+            }));
+        }
+
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+        res.send(jsonToCsv(rows));
+    });
+});
+
 // Start server
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
     app.listen(PORT, () => {
