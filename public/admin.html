@@ -86,6 +86,9 @@
                 <h1>🛡️ Admin Dashboard</h1>
                 <p>System Auditing & Database Tracking Control</p>
             </div>
+            <button class="view-btn" onclick="triggerRefresh(event)" id="refreshBtn" style="padding: 10px 20px; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                <span>🔄</span> Refresh Data
+            </button>
         </header>
 
         <!-- Stats Grid -->
@@ -237,7 +240,32 @@
 
             document.getElementById(tabId).classList.add('active');
             e.currentTarget.classList.add('active');
+
+            // Auto reload logs upon switching tabs to reflect real-time modifications instantly
+            loadAdminDashboard();
         }
+
+        async function triggerRefresh(e) {
+            const btn = document.getElementById('refreshBtn');
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.7';
+            btn.innerHTML = '<span>⏳</span> Refreshing...';
+
+            await loadAdminDashboard();
+
+            setTimeout(() => {
+                btn.style.pointerEvents = 'auto';
+                btn.style.opacity = '1';
+                btn.innerHTML = '<span>🔄</span> Refresh Data';
+            }, 500);
+        }
+
+        // Auto reload on browser tab focus
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                loadAdminDashboard();
+            }
+        });
 
         async function fetchAdminData(endpoint) {
             try {
