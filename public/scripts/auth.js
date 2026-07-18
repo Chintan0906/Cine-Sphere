@@ -34,6 +34,7 @@
         if (navLinks) {
             if (user) {
                 const initial = (user.username && user.username.length > 0) ? user.username.charAt(0).toUpperCase() : 'U';
+                const adminLink = user.isAdmin ? `<a href="admin.html">🛡️ Admin Portal</a>` : '';
                 navLinks.innerHTML = `
                     <a href="index.html">Home</a>
                     <a href="about_us.html">About Us</a>
@@ -42,6 +43,7 @@
                         <span class="profile-name">Hi, ${user.username || 'User'}</span>
                         <div class="profile-dropdown">
                             <a href="profile.html">🌌 Profile</a>
+                            ${adminLink}
                             <a href="#" onclick="logout(event)">🚀 Logout</a>
                         </div>
                     </div>

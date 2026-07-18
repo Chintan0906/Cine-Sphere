@@ -583,11 +583,20 @@
             chatBody.appendChild(typingIndicator); // Move to bottom
             chatBody.scrollTop = chatBody.scrollHeight;
 
+            const userStr = localStorage.getItem('user');
+            let userId = null;
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    userId = user.userId;
+                } catch(e) {}
+            }
+
             try {
                 const response = await fetch('/api/movies', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message }) 
+                    body: JSON.stringify({ message: message, userId: userId }) 
                 });
                 
                 const data = await response.json();

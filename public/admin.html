@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - CineSphere</title>
+    <link rel="stylesheet" href="styles/global.css?v=1.0.2">
+    <script src="scripts/auth.js?v=1.0.1"></script>
+    <style>
+        .admin-container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; flex: 1; position: relative; z-index: 10; width: 100%; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        header h1 { font-family: 'Outfit', sans-serif; font-size: 2.8rem; color: #fff; }
+        header p { color: var(--primary); font-size: 1.1rem; }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: rgba(15, 15, 15, 0.75); border: 1px solid var(--glass-border); border-radius: 16px; padding: 25px; backdrop-filter: blur(20px); text-align: center; transition: 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); border-color: rgba(255, 215, 0, 0.3); }
+        .stat-num { font-family: 'Outfit', sans-serif; font-size: 2.5rem; color: var(--primary); font-weight: 800; margin-bottom: 5px; }
+        .stat-label { color: var(--text-muted); font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Tabs Control */
+        .admin-tabs { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 10px; overflow-x: auto; }
+        .tab-btn { background: none; border: none; padding: 12px 24px; color: var(--text-muted); font-family: 'Outfit', sans-serif; font-size: 1.1rem; cursor: pointer; transition: 0.3s; border-radius: 8px; font-weight: 600; white-space: nowrap; }
+        .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .tab-btn.active { color: #000; background: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
+
+        /* Data Section */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Tables & Lists */
+        .table-wrapper { background: rgba(10, 10, 10, 0.7); border: 1px solid var(--glass-border); border-radius: 16px; overflow-x: auto; backdrop-filter: blur(20px); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 18px 24px; background: rgba(255,255,255,0.03); color: var(--primary); font-family: 'Outfit', sans-serif; font-weight: 600; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        td { padding: 18px 24px; color: #ccc; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.95rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+        .badge-admin { background: rgba(255, 215, 0, 0.15); color: var(--primary); border: 1px solid var(--primary); }
+        .badge-user { background: rgba(255, 255, 255, 0.08); color: #ccc; }
+
+        .json-viewer { background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; color: #a5d6a7; overflow-x: auto; max-width: 350px; white-space: pre-wrap; }
+
+        @media (max-width: 768px) {
+            .admin-container { padding: 25px 15px; }
+            header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            header h1 { font-size: 2.2rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-bg"></div>
+    <div id="stars"></div>
+
+    <nav>
+        <a href="index.html" class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" stroke="url(#logoGrad)" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="4" fill="url(#logoGrad)"/>
+                    <path d="M12 2v6M12 16v6M2 12h6M16 12h6" stroke="url(#logoGrad)" stroke-width="1.5"/>
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#fff176" />
+                            <stop offset="50%" stop-color="#ffd700" />
+                            <stop offset="100%" stop-color="#ffb300" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            CINE<span>SPHERE</span>
+        </a>
+        <div class="nav-links">
+            <!-- Dynamic links injected by auth.js -->
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <header>
+            <div>
+                <h1>🛡️ Admin Dashboard</h1>
+                <p>System Auditing & Database Tracking Control</p>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-num" id="totalUsersVal">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="totalBookingsVal">0</div>
+                <div class="stat-label">Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="totalSnacksVal">$0.00</div>
+                <div class="stat-label">Snack Sales</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="totalChatsVal">0</div>
+                <div class="stat-label">AI Chat Queries</div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'usersTab')">Registered Users</button>
+            <button class="tab-btn" onclick="switchTab(event, 'bookingsTab')">Movie Bookings</button>
+            <button class="tab-btn" onclick="switchTab(event, 'snacksTab')">Snack Orders</button>
+            <button class="tab-btn" onclick="switchTab(event, 'reviewsTab')">User Reviews</button>
+            <button class="tab-btn" onclick="switchTab(event, 'chatsTab')">Chatbot Logs</button>
+        </div>
+
+        <!-- Registered Users Tab -->
+        <div id="usersTab" class="tab-content active">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Username</th>
+                            <th>Email Address</th>
+                            <th>System Role</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr><td colspan="4" style="text-align:center;">Loading user logs...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bookings Tab -->
+        <div id="bookingsTab" class="tab-content">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>User</th>
+                            <th>Theater</th>
+                            <th>Showtime</th>
+                            <th>Tickets</th>
+                            <th>Total Price</th>
+                            <th>Booking Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsTableBody">
+                        <tr><td colspan="7" style="text-align:center;">Loading booking logs...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Snacks Tab -->
+        <div id="snacksTab" class="tab-content">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>User</th>
+                            <th>Concession Items</th>
+                            <th>Total Price</th>
+                            <th>Order Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="snacksTableBody">
+                        <tr><td colspan="5" style="text-align:center;">Loading concession logs...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- User Reviews Tab -->
+        <div id="reviewsTab" class="tab-content">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Review ID</th>
+                            <th>User</th>
+                            <th>Rating</th>
+                            <th>Comment</th>
+                            <th>Submission Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reviewsTableBody">
+                        <tr><td colspan="5" style="text-align:center;">Loading review logs...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Chatbot Logs Tab -->
+        <div id="chatsTab" class="tab-content">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Chat ID</th>
+                            <th>User ID</th>
+                            <th>User Message</th>
+                            <th>AI Bot Response</th>
+                            <th>Date Logged</th>
+                        </tr>
+                    </thead>
+                    <tbody id="chatsTableBody">
+                        <tr><td colspan="5" style="text-align:center;">Loading chat logs...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check Authentication Status immediately
+        const userSession = JSON.parse(localStorage.getItem('user'));
+        if (!userSession || !userSession.isAdmin) {
+            window.location.href = 'index.html';
+        }
+
+        const adminId = userSession.userId;
+
+        function switchTab(e, tabId) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(b => b.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            e.currentTarget.classList.add('active');
+        }
+
+        async function fetchAdminData(endpoint) {
+            try {
+                const res = await fetch(`/api/admin/${endpoint}?adminId=${adminId}`, {
+                    headers: { 'x-admin-id': adminId }
+                });
+                return await res.json();
+            } catch (err) {
+                console.error(`Failed to load ${endpoint}:`, err);
+                return { success: false };
+            }
+        }
+
+        async function loadAdminDashboard() {
+            // Load Users
+            const usersData = await fetchAdminData('users');
+            const usersBody = document.getElementById('usersTableBody');
+            if (usersData.success) {
+                document.getElementById('totalUsersVal').innerText = usersData.users.length;
+                usersBody.innerHTML = usersData.users.map(u => `
+                    <tr>
+                        <td><strong>#${u.id}</strong></td>
+                        <td>${u.username}</td>
+                        <td>${u.email}</td>
+                        <td><span class="badge ${u.is_admin ? 'badge-admin' : 'badge-user'}">${u.is_admin ? 'Admin' : 'User'}</span></td>
+                    </tr>
+                `).join('');
+            } else {
+                usersBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#ff4c4c;">Failed to load user logs</td></tr>`;
+            }
+
+            // Load Bookings
+            const bookingsData = await fetchAdminData('bookings');
+            const bookingsBody = document.getElementById('bookingsTableBody');
+            if (bookingsData.success) {
+                document.getElementById('totalBookingsVal').innerText = bookingsData.bookings.length;
+                bookingsBody.innerHTML = bookingsData.bookings.map(b => `
+                    <tr>
+                        <td><strong>#${b.id}</strong></td>
+                        <td>${b.username} (ID: #${b.user_id})</td>
+                        <td>${b.theater}</td>
+                        <td>${b.showtime}</td>
+                        <td>${b.tickets} Tickets</td>
+                        <td><span style="color:var(--primary); font-weight:700;">$${parseFloat(b.total).toFixed(2)}</span></td>
+                        <td>${new Date(b.created_at).toLocaleString()}</td>
+                    </tr>
+                `).join('');
+            } else {
+                bookingsBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ff4c4c;">Failed to load booking logs</td></tr>`;
+            }
+
+            // Load Snacks
+            const snacksData = await fetchAdminData('snacks');
+            const snacksBody = document.getElementById('snacksTableBody');
+            if (snacksData.success) {
+                const totalSales = snacksData.snacks.reduce((sum, s) => sum + parseFloat(s.total), 0);
+                document.getElementById('totalSnacksVal').innerText = `$${totalSales.toFixed(2)}`;
+                
+                snacksBody.innerHTML = snacksData.snacks.map(s => `
+                    <tr>
+                        <td><strong>#${s.id}</strong></td>
+                        <td>${s.username} (ID: #${s.user_id})</td>
+                        <td>${Array.isArray(s.items) ? s.items.join(', ') : s.items}</td>
+                        <td><span style="color:var(--primary); font-weight:700;">$${parseFloat(s.total).toFixed(2)}</span></td>
+                        <td>${new Date(s.created_at).toLocaleString()}</td>
+                    </tr>
+                `).join('');
+            } else {
+                snacksBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#ff4c4c;">Failed to load concession logs</td></tr>`;
+            }
+
+            // Load Reviews
+            const reviewsData = await fetchAdminData('reviews');
+            const reviewsBody = document.getElementById('reviewsTableBody');
+            if (reviewsData.success) {
+                reviewsBody.innerHTML = reviewsData.reviews.map(r => `
+                    <tr>
+                        <td><strong>#${r.id}</strong></td>
+                        <td>${r.username} (ID: #${r.user_id})</td>
+                        <td><span style="color:var(--primary); font-weight:700;">★ ${r.rating}/5</span></td>
+                        <td>${r.comment}</td>
+                        <td>${new Date(r.created_at).toLocaleString()}</td>
+                    </tr>
+                `).join('');
+            } else {
+                reviewsBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#ff4c4c;">Failed to load review logs</td></tr>`;
+            }
+
+            // Load Chats
+            const chatsData = await fetchAdminData('chats');
+            const chatsBody = document.getElementById('chatsTableBody');
+            if (chatsData.success) {
+                document.getElementById('totalChatsVal').innerText = chatsData.chats.length;
+                chatsBody.innerHTML = chatsData.chats.map(c => `
+                    <tr>
+                        <td><strong>#${c.id}</strong></td>
+                        <td>${c.user_id ? 'User #' + c.user_id : '<span style="color:#888;">Anonymous</span>'}</td>
+                        <td>${c.user_message}</td>
+                        <td><div class="json-viewer">${JSON.stringify(c.bot_response, null, 2)}</div></td>
+                        <td>${new Date(c.created_at).toLocaleString()}</td>
+                    </tr>
+                `).join('');
+            } else {
+                chatsBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#ff4c4c;">Failed to load chatbot logs</td></tr>`;
+            }
+        }
+
+        loadAdminDashboard();
+    </script>
+</body>
+</html>

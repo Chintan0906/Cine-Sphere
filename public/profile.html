@@ -168,16 +168,31 @@
                     container.innerHTML = '';
                     data.history.forEach((item, index) => {
                         const date = new Date(item.created_at).toLocaleString();
-                        let icon = item.action_type === 'booking' ? '🎟️' : '🍿';
-                        let title = item.action_type === 'booking' ? 'Movie Ticket Booked' : 'Snacks Ordered';
+                        let icon = '🍿';
+                        let title = 'Snacks Ordered';
                         let detailsStr = '';
+                        const hasDetails = (item.action_type === 'booking' || item.action_type === 'snacks');
 
                         if (item.action_type === 'booking') {
+                            icon = '🎟️';
+                            title = 'Movie Ticket Booked';
                             detailsStr = `<span>Tickets: ${item.details.tickets}</span> Total: $${parseFloat(item.details.total).toFixed(2)}`;
-                        } else {
+                        } else if (item.action_type === 'snacks') {
+                            icon = '🍿';
+                            title = 'Snacks Ordered';
                             const itemsList = item.details.items ? item.details.items.length + ' Items' : 'Various Items';
                             detailsStr = `<span>${itemsList}</span> Total: $${parseFloat(item.details.total).toFixed(2)}`;
+                        } else if (item.action_type === 'login') {
+                            icon = '🔐';
+                            title = 'Logged In';
+                            detailsStr = `<span>Session started successfully</span>`;
+                        } else if (item.action_type === 'register') {
+                            icon = '✨';
+                            title = 'Account Created';
+                            detailsStr = `<span>Welcome to CineSphere!</span>`;
                         }
+
+                        const detailsButton = hasDetails ? `<button class="view-btn" onclick="openModal(${index})">View Details</button>` : '';
 
                         container.innerHTML += `
                             <div class="history-card">
@@ -190,7 +205,7 @@
                                 </div>
                                 <div class="history-right">
                                     <div class="history-date">${date}</div>
-                                    <button class="view-btn" onclick="openModal(${index})">View Details</button>
+                                    ${detailsButton}
                                 </div>
                             </div>
                         `;
