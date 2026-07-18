@@ -274,6 +274,12 @@ if (sqlite3) {
                 if (cb) cb(null, user || null);
                 return;
             }
+            if (sql.includes("FROM users WHERE id =")) {
+                const [id] = params;
+                const user = mockUsers.find(u => u.id == id);
+                if (cb) cb(null, user || null);
+                return;
+            }
             if (cb) cb(null, null);
         },
         all: (sql, params, cb) => {
@@ -287,6 +293,33 @@ if (sqlite3) {
                     ...h,
                     details: typeof h.details === 'string' ? h.details : JSON.stringify(h.details)
                 }));
+                if (cb) cb(null, rows);
+                return;
+            }
+            if (sql.includes("FROM users")) {
+                if (cb) cb(null, mockUsers.map(u => ({ id: u.id, username: u.username, email: u.email, is_admin: u.is_admin })));
+                return;
+            }
+            if (sql.includes("FROM bookings")) {
+                const rows = mockBookings.map(b => {
+                    const user = mockUsers.find(u => u.id === b.user_id);
+                    return {
+                        ...b,
+                        username: user ? user.username : "CosmicTraveler"
+                    };
+                });
+                if (cb) cb(null, rows);
+                return;
+            }
+            if (sql.includes("FROM snacks")) {
+                const rows = mockSnacks.map(s => {
+                    const user = mockUsers.find(u => u.id === s.user_id);
+                    return {
+                        ...s,
+                        items: typeof s.items === 'string' ? s.items : JSON.stringify(s.items),
+                        username: user ? user.username : "CosmicTraveler"
+                    };
+                });
                 if (cb) cb(null, rows);
                 return;
             }
