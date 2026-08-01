@@ -62,33 +62,77 @@ if (process.env.VERCEL) {
 }
 
 // In-Memory Database Fallback Data Structures
-let mockUsers = [
-    { id: 1, username: "admin", email: "admin@cinesphere.com", password: bcrypt.hashSync("CineSphereAdmin2026!", 10), is_admin: 1 },
-    { id: 2, username: "sarah_connor", email: "sarah.connor@sky.net", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 3, username: "tony_stark", email: "tony@starkindustries.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 4, username: "bruce_wayne", email: "bruce@waynecorp.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 5, username: "clark_kent", email: "clark@dailyplanet.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 6, username: "peter_parker", email: "peter.parker@dailybugle.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 7, username: "john_doe", email: "john.doe@gmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 8, username: "jane_smith", email: "jane.smith@yahoo.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 9, username: "david_miller", email: "david.miller@outlook.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 10, username: "emily_davis", email: "emily.davis@hotmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 11, username: "michael_wilson", email: "m.wilson@gmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 12, username: "jessica_taylor", email: "jessica.t@yahoo.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 13, username: "robert_thomas", email: "robert.thomas@live.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 14, username: "linda_jackson", email: "linda.j@mail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 15, username: "william_white", email: "william.white@gmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 16, username: "elizabeth_harris", email: "e.harris@outlook.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 17, username: "joseph_martin", email: "joseph.m@gmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 18, username: "barbara_clark", email: "barbara.c@yahoo.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 19, username: "thomas_rodriguez", email: "thomas.r@hotmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 20, username: "susan_lewis", email: "susan.lewis@gmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 21, username: "christopher_lee", email: "christopher.lee@yahoo.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 22, username: "margaret_walker", email: "margaret.w@gmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 23, username: "matthew_hall", email: "matthew.hall@live.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 24, username: "lisa_allen", email: "lisa.allen@outlook.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 },
-    { id: 25, username: "chintan_jain", email: "chintan.jain@gmail.com", password: bcrypt.hashSync("CineSphereUser2026!", 10), is_admin: 0 }
+const defaultUserPass = bcrypt.hashSync("CineSphereUser2026!", 10);
+const adminUserPass = bcrypt.hashSync("CineSphereAdmin2026!", 10);
+
+const userProfilesList = [
+    { username: "admin", email: "admin@cinesphere.com", pass: adminUserPass, is_admin: 1, segment: "admin" },
+    
+    // --- VIP Segment (Frequent visitors, high spenders, active) ---
+    { username: "sarah_connor", email: "sarah.connor@sky.net", segment: "VIP" },
+    { username: "tony_stark", email: "tony@starkindustries.com", segment: "VIP" },
+    { username: "bruce_wayne", email: "bruce@waynecorp.com", segment: "VIP" },
+    { username: "chintan_jain", email: "chintan.jain@gmail.com", segment: "VIP" },
+    { username: "alexandra_daddario", email: "alexandra.d@hollywood.com", segment: "VIP" },
+    { username: "marcus_aurelius", email: "marcus.a@classics.org", segment: "VIP" },
+    { username: "elena_rodriguez", email: "elena.rodriguez@techcorp.io", segment: "VIP" },
+    { username: "vikram_singh", email: "vikram.singh@mumbai.in", segment: "VIP" },
+    { username: "sophia_chen", email: "sophia.chen@stanford.edu", segment: "VIP" },
+    { username: "david_beckham", email: "david@intermiami.com", segment: "VIP" },
+
+    // --- Regular Segment (Steady, moderate spend) ---
+    { username: "clark_kent", email: "clark@dailyplanet.com", segment: "Regular" },
+    { username: "peter_parker", email: "peter.parker@dailybugle.com", segment: "Regular" },
+    { username: "john_doe", email: "john.doe@gmail.com", segment: "Regular" },
+    { username: "jane_smith", email: "jane.smith@yahoo.com", segment: "Regular" },
+    { username: "david_miller", email: "david.miller@outlook.com", segment: "Regular" },
+    { username: "emily_davis", email: "emily.davis@hotmail.com", segment: "Regular" },
+    { username: "michael_wilson", email: "m.wilson@gmail.com", segment: "Regular" },
+    { username: "jessica_taylor", email: "jessica.t@yahoo.com", segment: "Regular" },
+    { username: "robert_thomas", email: "robert.thomas@live.com", segment: "Regular" },
+    { username: "linda_jackson", email: "linda.j@mail.com", segment: "Regular" },
+    { username: "william_white", email: "william.white@gmail.com", segment: "Regular" },
+    { username: "elizabeth_harris", email: "e.harris@outlook.com", segment: "Regular" },
+    { username: "joseph_martin", email: "joseph.m@gmail.com", segment: "Regular" },
+    { username: "barbara_clark", email: "barbara.c@yahoo.com", segment: "Regular" },
+
+    // --- At-Risk / Churned Segment (Active early in 2026, no recent activity) ---
+    { username: "thomas_rodriguez", email: "thomas.r@hotmail.com", segment: "At-Risk" },
+    { username: "susan_lewis", email: "susan.lewis@gmail.com", segment: "At-Risk" },
+    { username: "christopher_lee", email: "christopher.lee@yahoo.com", segment: "At-Risk" },
+    { username: "margaret_walker", email: "margaret.w@gmail.com", segment: "At-Risk" },
+    { username: "matthew_hall", email: "matthew.hall@live.com", segment: "At-Risk" },
+    { username: "lisa_allen", email: "lisa.allen@outlook.com", segment: "At-Risk" },
+    { username: "daniel_young", email: "daniel.young@gmail.com", segment: "At-Risk" },
+    { username: "nancy_king", email: "nancy.king@yahoo.com", segment: "At-Risk" },
+    { username: "paul_wright", email: "paul.wright@outlook.com", segment: "At-Risk" },
+
+    // --- Occasional / One-Time Buyers ---
+    { username: "karen_scott", email: "karen.scott@gmail.com", segment: "Occasional" },
+    { username: "steven_green", email: "steven.green@hotmail.com", segment: "Occasional" },
+    { username: "betty_baker", email: "betty.baker@yahoo.com", segment: "Occasional" },
+    { username: "edward_adams", email: "edward.adams@live.com", segment: "Occasional" },
+    { username: "brian_nelson", email: "brian.nelson@gmail.com", segment: "Occasional" },
+    { username: "dorothy_hill", email: "dorothy.hill@outlook.com", segment: "Occasional" },
+    { username: "ronald_ramirez", email: "ronald.r@gmail.com", segment: "Occasional" },
+
+    // --- New Users (Recently joined, 1 recent interaction) ---
+    { username: "samuel_campbell", email: "samuel.c@gmail.com", segment: "New" },
+    { username: "hannah_mitchell", email: "hannah.m@yahoo.com", segment: "New" },
+    { username: "brandon_roberts", email: "brandon.r@outlook.com", segment: "New" },
+    { username: "samantha_carter", email: "samantha.carter@sg1.org", segment: "New" },
+    { username: "nathan_drake", email: "nathan.drake@uncharted.com", segment: "New" }
 ];
+
+let mockUsers = userProfilesList.map((u, idx) => ({
+    id: idx + 1,
+    username: u.username,
+    email: u.email,
+    password: u.pass || defaultUserPass,
+    is_admin: u.is_admin || 0,
+    segment: u.segment
+}));
+
 let mockHistory = [];
 let mockReviews = [];
 let mockChats = [];
@@ -97,117 +141,159 @@ let mockSnacks = [];
 
 // Seed Mock Data dynamically on startup
 (function seedMocks() {
-    const theaters = ["IMAX Nebula", "Stardust Suite", "Solar Hall", "Apollo Theater", "Cosmic Screen"];
-    const showtimes = ["2:30 PM", "5:15 PM", "8:00 PM", "10:45 PM"];
-    const dates = [
-        "2026-07-10 14:32:00", "2026-07-11 17:40:00", "2026-07-12 20:15:00", 
-        "2026-07-13 22:50:00", "2026-07-14 15:20:00", "2026-07-15 18:10:00", 
-        "2026-07-16 20:30:00", "2026-07-17 21:00:00", "2026-07-18 16:45:00"
+    const datesQ1 = [
+        "2026-01-05 14:10:00", "2026-01-14 18:30:00", "2026-01-22 20:15:00", "2026-01-28 21:00:00",
+        "2026-02-02 15:45:00", "2026-02-14 19:00:00", "2026-02-20 20:45:00", "2026-02-27 22:15:00",
+        "2026-03-04 16:20:00", "2026-03-12 18:00:00", "2026-03-19 21:30:00", "2026-03-25 17:15:00"
     ];
 
-    // Seed Bookings
-    for (let i = 0; i < 30; i++) {
-        const uId = Math.floor(Math.random() * (mockUsers.length - 1)) + 2; // skip admin (id 1)
-        const th = theaters[Math.floor(Math.random() * theaters.length)];
-        const st = showtimes[Math.floor(Math.random() * showtimes.length)];
-        const tix = Math.floor(Math.random() * 4) + 1;
-        const total = tix * 14.50;
-        const dt = dates[Math.floor(Math.random() * dates.length)];
+    const datesQ2 = [
+        "2026-04-03 15:00:00", "2026-04-11 18:45:00", "2026-04-18 20:30:00", "2026-04-26 21:45:00",
+        "2026-05-02 14:30:00", "2026-05-10 17:15:00", "2026-05-16 19:30:00", "2026-05-24 22:00:00",
+        "2026-06-01 16:00:00", "2026-06-08 18:20:00", "2026-06-15 20:00:00", "2026-06-22 21:15:00"
+    ];
 
-        mockBookings.push({ id: i + 1, user_id: uId, theater: th, showtime: st, tickets: tix, total, created_at: dt });
-        mockHistory.push({
-            id: mockHistory.length + 1,
-            user_id: uId,
-            action_type: 'booking',
-            details: { theater: th, showtime: st, tickets: tix, total },
-            created_at: dt
-        });
-    }
+    const datesQ3 = [
+        "2026-07-01 14:00:00", "2026-07-05 17:30:00", "2026-07-09 19:15:00", "2026-07-12 20:45:00",
+        "2026-07-15 15:30:00", "2026-07-18 18:00:00", "2026-07-22 20:00:00", "2026-07-26 21:30:00",
+        "2026-07-29 16:45:00", "2026-07-31 19:50:00"
+    ];
 
-    // Seed Snack Orders
-    const snackMenu = [
+    const theaters = ["IMAX Nebula", "Stardust Suite", "Solar Hall", "Apollo Theater", "Cosmic Screen"];
+    const showtimes = ["2:30 PM", "5:15 PM", "8:00 PM", "10:45 PM"];
+
+    const snackItemsList = [
         { name: "Caramel Popcorn", price: 7.50 },
-        { name: "Nachos with Cheese", price: 8.50 },
+        { name: "Loaded Nachos", price: 8.50 },
         { name: "Galactic Hot Dog", price: 9.00 },
         { name: "Jumbo Sprite", price: 5.50 },
         { name: "Coca Cola Medium", price: 4.50 },
-        { name: "Choc Bar Ice Cream", price: 4.00 }
+        { name: "Choc Bar Ice Cream", price: 4.00 },
+        { name: "Butter Popcorn Large", price: 8.00 },
+        { name: "Slushie Cosmic Fizz", price: 6.00 }
     ];
 
-    for (let i = 0; i < 30; i++) {
-        const uId = Math.floor(Math.random() * (mockUsers.length - 1)) + 2;
-        const itemCount = Math.floor(Math.random() * 3) + 1;
-        const items = [];
-        let total = 0;
-        for (let j = 0; j < itemCount; j++) {
-            const sn = snackMenu[Math.floor(Math.random() * snackMenu.length)];
-            items.push(sn.name);
-            total += sn.price;
+    const reviewPool = [
+        { rating: 5, comment: "IMAX Nebula audio and visual fidelity is unmatched! Absolute masterpiece." },
+        { rating: 5, comment: "Dune Part Two was mindblowing. Premium seats were extremely comfortable." },
+        { rating: 4, comment: "Great atmosphere and quick snack delivery right to our seats." },
+        { rating: 5, comment: "Oppenheimer in IMAX Stardust suite is an unforgettable experience!" },
+        { rating: 4, comment: "Loved the online booking process. Extremely fast and seamless." },
+        { rating: 3, comment: "Movie was nice but the theater temperature was a bit too cold." },
+        { rating: 5, comment: "Interstellar re-release was out of this world! 10/10 recommend." },
+        { rating: 2, comment: "Popcorn was slightly cold and line at concession counter was long." },
+        { rating: 4, comment: "Clean screens, crisp sound, and easy navigation on CineSphere." },
+        { rating: 5, comment: "The AI chatbot recommendation was spot on for my weekend movie pick!" }
+    ];
+
+    const chatPool = [
+        { msg: "Recommend top IMAX sci-fi movies showing tonight", res: { type: "movies", movies: [{ name: "Dune: Part Two", genre: "Sci-Fi", reason: "IMAX Visual masterpiece" }, { name: "Interstellar", genre: "Sci-Fi", reason: "Cosmic soundtrack" }] } },
+        { msg: "What showtimes are available for Oppenheimer in Solar Hall?", res: { type: "text", message: "Solar Hall features Oppenheimer at 5:15 PM and 8:00 PM today." } },
+        { msg: "Are loaded nachos and drinks available for online order?", res: { type: "text", message: "Yes! You can order Loaded Nachos ($8.50) and Jumbo Sprite ($5.50) directly from concessions." } },
+        { msg: "Give me details for Inception plot and director", res: { type: "details", title: "Inception", year: "2010", genre: "Sci-Fi", summary: "Mind-bending dream heist.", director: "Christopher Nolan" } },
+        { msg: "What is the best seat section for Dolby Atmos?", res: { type: "text", message: "Middle rows (E to H) in Stardust Suite offer optimal acoustic balance." } }
+    ];
+
+    const nonAdminMocks = mockUsers.filter(u => u.segment !== 'admin');
+    let bId = 1;
+    let sId = 1;
+    let rId = 1;
+    let cId = 1;
+
+    nonAdminMocks.forEach(u => {
+        let bookingDates = [];
+        let numBookings = 0;
+        let ticketsPerBookingRange = [1, 2];
+
+        if (u.segment === 'VIP') {
+            numBookings = 9;
+            bookingDates = [...datesQ1, ...datesQ2, ...datesQ3];
+            ticketsPerBookingRange = [2, 4];
+        } else if (u.segment === 'Regular') {
+            numBookings = 5;
+            bookingDates = [...datesQ1.slice(4), ...datesQ2, ...datesQ3.slice(0, 5)];
+            ticketsPerBookingRange = [1, 3];
+        } else if (u.segment === 'At-Risk') {
+            numBookings = 4;
+            bookingDates = [...datesQ1, datesQ2[0], datesQ2[1]];
+            ticketsPerBookingRange = [1, 2];
+        } else if (u.segment === 'Occasional') {
+            numBookings = 2;
+            bookingDates = [...datesQ2, ...datesQ3];
+            ticketsPerBookingRange = [1, 2];
+        } else if (u.segment === 'New') {
+            numBookings = 1;
+            bookingDates = datesQ3.slice(-3);
+            ticketsPerBookingRange = [1, 2];
         }
-        const dt = dates[Math.floor(Math.random() * dates.length)];
 
-        mockSnacks.push({ id: i + 1, user_id: uId, items, total, created_at: dt });
-        mockHistory.push({
-            id: mockHistory.length + 1,
-            user_id: uId,
-            action_type: 'snacks',
-            details: { items, total },
-            created_at: dt
+        const selectedDates = [...bookingDates].sort(() => 0.5 - Math.random()).slice(0, numBookings);
+        selectedDates.sort();
+
+        selectedDates.forEach(dt => {
+            const th = theaters[Math.floor(Math.random() * theaters.length)];
+            const st = showtimes[Math.floor(Math.random() * showtimes.length)];
+            const tix = Math.floor(Math.random() * (ticketsPerBookingRange[1] - ticketsPerBookingRange[0] + 1)) + ticketsPerBookingRange[0];
+            const price = tix * 14.50;
+
+            mockBookings.push({ id: bId++, user_id: u.id, theater: th, showtime: st, tickets: tix, total: price, created_at: dt });
+            mockHistory.push({
+                id: mockHistory.length + 1,
+                user_id: u.id,
+                action_type: 'booking',
+                details: { theater: th, showtime: st, tickets: tix, total: price },
+                created_at: dt
+            });
+
+            const snackChance = u.segment === 'VIP' ? 0.9 : (u.segment === 'Regular' ? 0.7 : 0.5);
+            if (Math.random() < snackChance) {
+                const numSnackTypes = Math.floor(Math.random() * 3) + 1;
+                const items = [];
+                let snackTotal = 0;
+                for (let k = 0; k < numSnackTypes; k++) {
+                    const item = snackItemsList[Math.floor(Math.random() * snackItemsList.length)];
+                    items.push(item.name);
+                    snackTotal += item.price;
+                }
+
+                mockSnacks.push({ id: sId++, user_id: u.id, items, total: snackTotal, created_at: dt });
+                mockHistory.push({
+                    id: mockHistory.length + 1,
+                    user_id: u.id,
+                    action_type: 'snacks',
+                    details: { items, total: snackTotal },
+                    created_at: dt
+                });
+            }
         });
-    }
 
-    // Seed Reviews
-    const reviewTemplates = [
-        { rating: 5, comment: "Dune Part Two is a cinematic miracle! The sound design was spectacular." },
-        { rating: 4, comment: "Inception leaves you questioning reality. Absolutely loved the pacing." },
-        { rating: 5, comment: "Interstellar is my absolute favorite. Cried twice. Hans Zimmer did a fantastic job." },
-        { rating: 3, comment: "The movie had a great first half but the ending felt rushed." },
-        { rating: 5, comment: "Oppenheimer is a masterclass in tension and cinematography." },
-        { rating: 4, comment: "A solid sci-fi thriller. Kept me on the edge of my seat." },
-        { rating: 2, comment: "Too long and repetitive. Beautiful visual elements, but no soul." },
-        { rating: 5, comment: "Everything Everywhere All at Once is absolutely genius!" },
-        { rating: 4, comment: "Visually stunning. The plot was simple but executed very well." },
-        { rating: 5, comment: "The Matrix remains the absolute pinnacle of sci-fi action." }
-    ];
+        const numReviews = u.segment === 'VIP' ? 2 : (u.segment === 'Regular' ? 1 : (Math.random() > 0.6 ? 1 : 0));
+        for (let r = 0; r < numReviews; r++) {
+            const rev = reviewPool[Math.floor(Math.random() * reviewPool.length)];
+            const rDate = selectedDates[r % selectedDates.length] || datesQ3[0];
+            mockReviews.push({ id: rId++, user_id: u.id, rating: rev.rating, comment: rev.comment, created_at: rDate });
+            mockHistory.push({
+                id: mockHistory.length + 1,
+                user_id: u.id,
+                action_type: 'review',
+                details: { rating: rev.rating, comment: rev.comment },
+                created_at: rDate
+            });
+        }
 
-    for (let i = 0; i < 20; i++) {
-        const uId = Math.floor(Math.random() * (mockUsers.length - 1)) + 2;
-        const template = reviewTemplates[i % reviewTemplates.length];
-        const dt = dates[Math.floor(Math.random() * dates.length)];
-
-        mockReviews.push({ id: i + 1, user_id: uId, rating: template.rating, comment: template.comment, created_at: dt });
-        mockHistory.push({
-            id: mockHistory.length + 1,
-            user_id: uId,
-            action_type: 'review',
-            details: { rating: template.rating, comment: template.comment },
-            created_at: dt
-        });
-    }
-
-    // Seed Chats
-    const chatLogs = [
-        { msg: "recommend some space movies", res: { type: "movies", movies: [{ name: "Interstellar", genre: "Sci-Fi", reason: "Profound cosmic themes" }, { name: "Gravity", genre: "Thriller", reason: "Intense survival story" }] } },
-        { msg: "what is the plot of inception", res: { type: "details", title: "Inception", year: "2010", genre: "Sci-Fi", summary: "Thieves enter dream worlds to steal secrets.", cast: ["Leonardo DiCaprio", "Elliot Page"], director: "Christopher Nolan" } },
-        { msg: "tell me about Oppenheimer", res: { type: "details", title: "Oppenheimer", year: "2023", genre: "Biography/Drama", summary: "The development of the nuclear bomb.", cast: ["Cillian Murphy", "Emily Blunt"], director: "Christopher Nolan" } },
-        { msg: "recommend comedy movies", res: { type: "text", message: "Here are some top comedies: Superbad, Groundhog Day, and The Hangover." } },
-        { msg: "is Dune available?", res: { type: "text", message: "Yes, Dune Part One and Part Two are available for ticket booking in IMAX." } },
-        { msg: "which theater has best audio?", res: { type: "text", message: "IMAX Nebula features full Dolby Atmos surround sound system." } }
-    ];
-
-    for (let i = 0; i < 25; i++) {
-        const uId = Math.floor(Math.random() * mockUsers.length) + 1;
-        const template = chatLogs[i % chatLogs.length];
-        const dt = dates[Math.floor(Math.random() * dates.length)];
-
-        mockChats.push({
-            id: i + 1,
-            user_id: uId % 2 === 0 ? uId : null,
-            user_message: template.msg,
-            bot_response: JSON.stringify(template.res),
-            created_at: dt
-        });
-    }
+        const numChats = u.segment === 'VIP' ? 3 : 1;
+        for (let c = 0; c < numChats; c++) {
+            const chat = chatPool[Math.floor(Math.random() * chatPool.length)];
+            const cDate = selectedDates[c % selectedDates.length] || datesQ2[0];
+            mockChats.push({
+                id: cId++,
+                user_id: u.id,
+                user_message: chat.msg,
+                bot_response: JSON.stringify(chat.res),
+                created_at: cDate
+            });
+        }
+    });
 })();
 
 let db;
